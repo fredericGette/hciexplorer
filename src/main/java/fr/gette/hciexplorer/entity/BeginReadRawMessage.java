@@ -16,7 +16,7 @@ public class BeginReadRawMessage extends DataRawMessage implements BeginRawMessa
 
 	private ZonedDateTime timestamp;
 
-	private byte[] inputBuffer;
+	private short[] inputBuffer;
 
 
 
@@ -31,7 +31,7 @@ public class BeginReadRawMessage extends DataRawMessage implements BeginRawMessa
 	}
 
 	@Override
-	protected byte[] getData()
+	protected short[] getData()
 	{
 		return getInputBuffer();
 	}

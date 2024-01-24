@@ -16,7 +16,7 @@ public class BeginWriteRawMessage extends DataRawMessage implements BeginRawMess
 
 	private ZonedDateTime timestamp;
 
-	private byte[] inputBuffer;
+	private short[] inputBuffer;
 
 	public BeginWriteRawMessage()
 	{
@@ -29,7 +29,7 @@ public class BeginWriteRawMessage extends DataRawMessage implements BeginRawMess
 	}
 
 	@Override
-	protected byte[] getData()
+	protected short[] getData()
 	{
 		return getInputBuffer();
 	}

@@ -11,15 +11,17 @@ public abstract class DataRawMessage
 	private int dataOffset = 0;
 	public void addData(String dataString)
 	{
-		byte[] data = getData();
+		short[] data = getData();
 		Scanner dataScanner = new Scanner(dataString);
-		while (dataScanner.hasNextByte(16)) {
-			byte dataByte = dataScanner.nextByte(16);
+		while (dataScanner.hasNextShort(16)) {
+			// We read "byte" values as "short" values to avoid overflow problems
+			// see https://stackoverflow.com/questions/48426307/converting-a-string-of-hexadecimal-valiues-into-an-array-of-bytes-using-scanner
+			short dataByte = dataScanner.nextShort(16);
 			data[dataOffset++] = dataByte;
 		}
 	}
 
-	abstract protected byte[] getData();
+	abstract protected short[] getData();
 
 	public boolean parsingFinished()
 	{

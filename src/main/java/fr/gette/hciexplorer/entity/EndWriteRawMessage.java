@@ -16,7 +16,7 @@ public class EndWriteRawMessage extends DataRawMessage implements EndRawMessage
 
 	private ZonedDateTime timestamp;
 
-	private byte[] outputBuffer;
+	private short[] outputBuffer;
 
 	private Long status;
 
@@ -31,7 +31,7 @@ public class EndWriteRawMessage extends DataRawMessage implements EndRawMessage
 	}
 
 	@Override
-	protected byte[] getData()
+	protected short[] getData()
 	{
 		return getOutputBuffer();
 	}

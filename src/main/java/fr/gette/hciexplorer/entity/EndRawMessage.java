@@ -2,8 +2,8 @@ package fr.gette.hciexplorer.entity;
 
 public interface EndRawMessage extends RawMessage
 {
-	byte[] getOutputBuffer();
-	void setOutputBuffer(byte[] outputBuffer);
+	short[] getOutputBuffer();
+	void setOutputBuffer(short[] outputBuffer);
 
 	Long getStatus();
 

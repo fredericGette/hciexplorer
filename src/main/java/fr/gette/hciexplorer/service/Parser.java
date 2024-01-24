@@ -76,6 +76,16 @@ public class Parser
 				}
 			}
 		}
+
+		// Persist "unfinished" messages
+		// Mainly because their status indicated a failure
+		for(RawMessage rawMessage: rawMessages.values())
+		{
+			// Silently ignore message which is not a DataRawMessage
+			if (rawMessage instanceof DataRawMessage) {
+				persist((DataRawMessage)rawMessage);
+			}
+		}
 	}
 
 	private void parseRawLine(String line, Map<Long, RawMessage> rawMessages) throws ParseException
@@ -192,7 +202,7 @@ public class Parser
 		}
 
 		Integer outputBufferLength = Integer.parseInt(ouputMatcher.group(2));
-		endRawMsg.setOutputBuffer(new byte[outputBufferLength]);
+		endRawMsg.setOutputBuffer(new short[outputBufferLength]);
 
 		Long status = Long.parseLong(ouputMatcher.group(3), 16);
 		endRawMsg.setStatus(status);
@@ -218,7 +228,7 @@ public class Parser
 		}
 
 		Integer inputBufferLength = Integer.parseInt(inputMatcher.group(2));
-		beginRawMsg.setInputBuffer(new byte[inputBufferLength]);
+		beginRawMsg.setInputBuffer(new short[inputBufferLength]);
 
 		return beginRawMsg;
 	}
