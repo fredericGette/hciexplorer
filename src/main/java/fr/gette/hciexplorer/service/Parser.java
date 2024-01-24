@@ -1,14 +1,6 @@
 package fr.gette.hciexplorer.service;
 
-import fr.gette.hciexplorer.entity.BeginRawMessage;
-import fr.gette.hciexplorer.entity.BeginReadRawMessage;
-import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
-import fr.gette.hciexplorer.entity.DataRawMessage;
-import fr.gette.hciexplorer.entity.EndRawMessage;
-import fr.gette.hciexplorer.entity.EndReadRawMessage;
-import fr.gette.hciexplorer.entity.EndWriteRawMessage;
-import fr.gette.hciexplorer.entity.RawMessage;
-import fr.gette.hciexplorer.entity.UnparsedRawMessage;
+import fr.gette.hciexplorer.entity.*;
 import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
 import fr.gette.hciexplorer.repository.EndReadRawMessageRepository;
@@ -31,7 +23,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,8 +55,8 @@ public class Parser
 
 		try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)))
 		{
-			String line = null;
-			while ((line = reader.readLine()) != null) {
+            String line;
+            while ((line = reader.readLine()) != null) {
 				try
 				{
 					parseRawLine(line, rawMessages);
@@ -185,7 +176,7 @@ public class Parser
 
 	private EndRawMessage buildEndRawMessage(UnparsedRawMessage rawMsg, Matcher ouputMatcher) throws ParseException
 	{
-		EndRawMessage endRawMsg = null;
+		EndRawMessage endRawMsg;
 
 		String IoControlCode = ouputMatcher.group(1);
 		if (IOCTL_BTHX_READ_HCI.equals(IoControlCode))
@@ -201,7 +192,7 @@ public class Parser
 			throw new ParseException("Unknown completed IoControlCode",0);
 		}
 
-		Integer outputBufferLength = Integer.parseInt(ouputMatcher.group(2));
+		int outputBufferLength = Integer.parseInt(ouputMatcher.group(2));
 		endRawMsg.setOutputBuffer(new short[outputBufferLength]);
 
 		Long status = Long.parseLong(ouputMatcher.group(3), 16);
@@ -211,7 +202,7 @@ public class Parser
 
 	private BeginRawMessage buildBeginRawMessage(UnparsedRawMessage rawMsg, Matcher inputMatcher) throws ParseException
 	{
-		BeginRawMessage beginRawMsg = null;
+		BeginRawMessage beginRawMsg;
 
 		String IoControlCode = inputMatcher.group(1);
 		if (IOCTL_BTHX_READ_HCI.equals(IoControlCode))
@@ -227,7 +218,7 @@ public class Parser
 			throw new ParseException("Unknown received IoControlCode",0);
 		}
 
-		Integer inputBufferLength = Integer.parseInt(inputMatcher.group(2));
+		int inputBufferLength = Integer.parseInt(inputMatcher.group(2));
 		beginRawMsg.setInputBuffer(new short[inputBufferLength]);
 
 		return beginRawMsg;

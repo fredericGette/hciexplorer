@@ -1,7 +1,6 @@
 package fr.gette.hciexplorer.entity;
 
 import jakarta.persistence.Transient;
-import lombok.Data;
 
 import java.util.Scanner;
 
