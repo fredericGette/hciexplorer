@@ -46,15 +46,9 @@ public class MessageDecoder {
 
         switch (hciPacketTypeBegin)
         {
-            case Command -> {
-                hciMsg = commandDecoder.decode(begin, end);
-            }
-            case AclData -> {
-                hciMsg = dataDecoder.decode(begin, end);
-            }
-            case Event -> {
-                hciMsg = eventDecoder.decode(begin, end);
-            }
+            case Command -> hciMsg = commandDecoder.decode(begin, end);
+            case AclData -> hciMsg = dataDecoder.decode(begin, end);
+            case Event -> hciMsg = eventDecoder.decode(begin, end);
             default -> throw new UnsupportedOperationException(
                     String.format("HCI packet type: {}",hciPacketTypeBegin));
         }

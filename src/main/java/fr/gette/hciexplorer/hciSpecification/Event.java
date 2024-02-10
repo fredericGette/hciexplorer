@@ -7,8 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Event extends HciMessage {
-    HciPacketType type = HciPacketType.Event;
-    short code;
-
+public abstract class Event extends HciMessage {
+    private HciPacketType type = HciPacketType.Event;
 }

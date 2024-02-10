@@ -3,10 +3,7 @@ package fr.gette.hciexplorer.service;
 import fr.gette.hciexplorer.entity.BeginReadRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
-import fr.gette.hciexplorer.hciSpecification.Event;
-import fr.gette.hciexplorer.hciSpecification.EventFailed;
-import fr.gette.hciexplorer.hciSpecification.HciMessage;
-import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,8 +29,7 @@ public class EventDecoder {
             short eventCode = readUChar(endData);
             short payloadLength = readUChar(endData);
 
-            Event event = new Event();
-            event.setCode(eventCode);
+            Event event = build(eventCode);
 
             hciMsg = event;
         }
@@ -45,5 +41,20 @@ public class EventDecoder {
         }
 
         return hciMsg;
+    }
+
+    private Event build(short eventCode)
+    {
+        Event event;
+
+        switch (eventCode)
+        {
+            case 0x01 -> event = new EventInquiryComplete();
+            case 0x0E -> event = new EventCommandComplete();
+            default -> throw new UnsupportedOperationException(
+                    String.format("Event code: {}",eventCode));
+        }
+
+        return event;
     }
 }

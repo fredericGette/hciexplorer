@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CommandFailed extends HciMessage {
-    HciPacketType type = HciPacketType.Command;
-    long errorCode;
+    private HciPacketType type = HciPacketType.Command;
+    private long errorCode;
 }

@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class EventFailed extends HciMessage {
-    HciPacketType type = HciPacketType.Event;
-    long errorCode;
+    private HciPacketType type = HciPacketType.Event;
+    private long errorCode;
 }

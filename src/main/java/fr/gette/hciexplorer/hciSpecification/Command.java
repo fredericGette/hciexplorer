@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Command extends HciMessage {
-    HciPacketType type = HciPacketType.Command;
+    private HciPacketType type = HciPacketType.Command;
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DataFailed extends HciMessage {
-    private HciPacketType type = HciPacketType.AclData;
-    private long errorCode;
+public class EventCommandComplete extends Event {
+    private EventCode code = EventCode.COMMAND_COMPLETE;
 }
