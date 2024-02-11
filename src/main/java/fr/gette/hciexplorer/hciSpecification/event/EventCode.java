@@ -1,5 +1,8 @@
 package fr.gette.hciexplorer.hciSpecification.event;
 
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
 public enum EventCode {
     INQUIRY_COMPLETE(0x01,"Indicates the Inquiry has finished."),
     INQUIRY_RESULT(0x02,"Indicates that Bluetooth device(s) have responded for the inquiry."),
@@ -57,11 +60,16 @@ public enum EventCode {
     BLUETOOTH_LOGO_TESTING(0xFE,""),
     VENDOR_SPECIFIC(0xFF,"");
 
-    int code;
-    String description;
+    final int code;
+    final String description;
 
     EventCode(int code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public static EventCode get(short code) {
+        return Arrays.stream(values()).filter(value -> value.code == code).findFirst()
+                .orElseThrow(NoSuchElementException::new);
     }
 }

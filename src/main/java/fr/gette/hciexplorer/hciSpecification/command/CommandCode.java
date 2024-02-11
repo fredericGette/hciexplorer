@@ -1,5 +1,8 @@
 package fr.gette.hciexplorer.hciSpecification.command;
 
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
 public enum CommandCode {
     LINK_CONTROL_INQUIRY(0x0401,"Command used to enter Inquiry mode where it discovers other Bluetooth devices."),
     LINK_CONTROL_INQUIRY_CANCEL(0x0402,"Command to cancel the Inquiry mode in which the Bluetooth device is in."),
@@ -272,12 +275,17 @@ public enum CommandCode {
     VENDOR_SPECIFIC_CONTROLLER_A2DP_OPCODE(0xFD5D,""),
     VENDOR_SPECIFIC_CONTROLLER_BQR(0xFD5E,"");
 
-    int code;
-    String description;
+    final int code;
+    final String description;
 
     CommandCode(int code, String description)
     {
         this.code = code;
         this.description = description;
+    }
+
+    public static CommandCode get(int code) {
+        return Arrays.stream(values()).filter(value -> value.code == code).findFirst()
+                .orElseThrow(NoSuchElementException::new);
     }
 }

@@ -4,8 +4,10 @@ import fr.gette.hciexplorer.entity.BeginReadRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
+import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
+import fr.gette.hciexplorer.hciSpecification.event.EventCode;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.EventCommandComplete;
 import fr.gette.hciexplorer.hciSpecification.event.EventFailed;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.WriteClassOfDeviceComplete;
@@ -28,7 +30,7 @@ public class EventDecoder {
         {
             long size = endData.readULong(); // size of the HCI packet
             HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
-            short eventCode = endData.readUChar();
+            EventCode eventCode = EventCode.get(endData.readUChar());
             short payloadLength = endData.readUChar();
 
             hciMsg = build(eventCode, endData);
@@ -43,15 +45,15 @@ public class EventDecoder {
         return hciMsg;
     }
 
-    private Event build(short eventCode, IoMessage data)
+    private Event build(EventCode eventCode, IoMessage data)
     {
         Event event;
 
         switch (eventCode)
         {
-            case 0x0E -> event = buildCommandComplete(data);
+            case COMMAND_COMPLETE -> event = buildCommandComplete(data);
             default -> throw new UnsupportedOperationException(
-                    String.format("Event code: 0x%02X",eventCode));
+                    String.format("Event code: %s",eventCode));
         }
 
         return event;
@@ -61,12 +63,12 @@ public class EventDecoder {
     {
         EventCommandComplete event;
         short numHciCommandPackets = data.readUChar();
-        int commandOpcode = data.readUShort();
+        CommandCode commandOpcode = CommandCode.get(data.readUShort());
         switch(commandOpcode)
         {
-            case 0x0C24 -> event = buildWriteClassOfDeviceComplete(data);
+            case CONTROLLER_AND_BASEBAND_WRITE_CLASS_OF_DEVICE -> event = buildWriteClassOfDeviceComplete(data);
             default -> throw new UnsupportedOperationException(
-                    String.format("Command Opcode : 0x%04X",commandOpcode));
+                    String.format("Command Opcode : %s",commandOpcode));
         }
         event.setNumHciCommandPackets(numHciCommandPackets);
         return event;
@@ -75,7 +77,7 @@ public class EventDecoder {
     private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoMessage data)
     {
         WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
-        event.setStatus(ErrorCode.getErrorCode(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.readUChar()));
         return event;
     }
 }

@@ -48,7 +48,7 @@ public class MessageDecoder {
             case AclData -> hciMsg = dataDecoder.decode(begin, end);
             case Event -> hciMsg = eventDecoder.decode(begin, end);
             default -> throw new UnsupportedOperationException(
-                    String.format("HCI packet type: {}",hciPacketTypeBegin));
+                    String.format("HCI packet type: %s",hciPacketTypeBegin));
         }
 
         return hciMsg;
