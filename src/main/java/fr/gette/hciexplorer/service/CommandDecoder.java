@@ -4,12 +4,11 @@ import fr.gette.hciexplorer.entity.BeginReadRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
+import fr.gette.hciexplorer.hciSpecification.command.Command;
+import fr.gette.hciexplorer.hciSpecification.command.CommandFailed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import static fr.gette.hciexplorer.service.DecoderHelper.readUChar;
-import static fr.gette.hciexplorer.service.DecoderHelper.readULong;
 
 @Service
 @RequiredArgsConstructor
@@ -20,18 +19,18 @@ public class CommandDecoder {
     {
         HciMessage hciMsg;
 
-        DecoderHelper.IoMessage beginData = new DecoderHelper.IoMessage(begin.getInputBuffer());
-        readULong(beginData); // remove the type of the HCI packet.
+        IoMessage beginData = new IoMessage(begin.getInputBuffer());
+        beginData.readULong(); // remove the type of the HCI packet.
 
-        DecoderHelper.IoMessage endData = new DecoderHelper.IoMessage(end.getOutputBuffer());
+        IoMessage endData = new IoMessage(end.getOutputBuffer());
 
         if (EndRawMessage.STATUS_SUCCESS.equals(end.getStatus()))
         {
-            long size = readULong(endData); // size of the HCI packet
-            HciPacketType hciPacketTypeEnd = HciPacketType.get(readUChar(endData));
+            long size = endData.readULong(); // size of the HCI packet
+            HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
 
-            long opCode = (readUChar(beginData) << 8) + readUChar(beginData);// Little-endian
-            short payloadLength = readUChar(beginData);
+            int opCode = beginData.readUShort();
+            short payloadLength = beginData.readUChar();
 
             Command command = new Command();
 

@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
-import static fr.gette.hciexplorer.service.DecoderHelper.readULong;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -40,9 +38,9 @@ public class MessageDecoder {
     {
         HciMessage hciMsg;
 
-        DecoderHelper.IoMessage beginData = new DecoderHelper.IoMessage(begin.getInputBuffer());
+        IoMessage beginData = new IoMessage(begin.getInputBuffer());
         // The message contains only one information: the type of the HCI packet.
-        HciPacketType hciPacketTypeBegin = HciPacketType.get(readULong(beginData));
+        HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.readULong());
 
         switch (hciPacketTypeBegin)
         {

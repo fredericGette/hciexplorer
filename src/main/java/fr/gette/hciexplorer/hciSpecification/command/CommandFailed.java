@@ -1,5 +1,7 @@
-package fr.gette.hciexplorer.hciSpecification;
+package fr.gette.hciexplorer.hciSpecification.command;
 
+import fr.gette.hciexplorer.hciSpecification.HciMessage;
+import fr.gette.hciexplorer.hciSpecification.HciPacketType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

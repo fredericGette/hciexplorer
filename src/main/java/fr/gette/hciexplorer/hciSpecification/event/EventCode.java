@@ -1,4 +1,4 @@
-package fr.gette.hciexplorer.hciSpecification;
+package fr.gette.hciexplorer.hciSpecification.event;
 
 public enum EventCode {
     INQUIRY_COMPLETE(0x01,"Indicates the Inquiry has finished."),
@@ -52,7 +52,7 @@ public enum EventCode {
     USER_PASSKEY_NOTIFICATION(0x3B,""),
     KEYPRESS_NOTIFICATION(0x3C,""),
     REMOTE_HOST_SUPPORTED_FEATURES_NOTIFICATION(0x3D,""),
-    LE_META_EVENT(0x3e,""),
+    LE_META_EVENT(0x3E,""),
     NUMBER_OF_COMPLETED_DATA_BLOCKS(0x48,""),
     BLUETOOTH_LOGO_TESTING(0xFE,""),
     VENDOR_SPECIFIC(0xFF,"");

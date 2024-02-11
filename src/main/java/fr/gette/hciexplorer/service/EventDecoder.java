@@ -4,12 +4,15 @@ import fr.gette.hciexplorer.entity.BeginReadRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
+import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
+import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
+import fr.gette.hciexplorer.hciSpecification.event.Event;
+import fr.gette.hciexplorer.hciSpecification.event.commandComplete.EventCommandComplete;
+import fr.gette.hciexplorer.hciSpecification.event.EventFailed;
+import fr.gette.hciexplorer.hciSpecification.event.commandComplete.WriteClassOfDeviceComplete;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import static fr.gette.hciexplorer.service.DecoderHelper.readUChar;
-import static fr.gette.hciexplorer.service.DecoderHelper.readULong;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +23,16 @@ public class EventDecoder {
     {
         HciMessage hciMsg;
 
-        DecoderHelper.IoMessage endData = new DecoderHelper.IoMessage(end.getOutputBuffer());
+        IoMessage endData = new IoMessage(end.getOutputBuffer());
 
         if (EndRawMessage.STATUS_SUCCESS.equals(end.getStatus()))
         {
-            long size = readULong(endData); // size of the HCI packet
-            HciPacketType hciPacketTypeEnd = HciPacketType.get(readUChar(endData));
-            short eventCode = readUChar(endData);
-            short payloadLength = readUChar(endData);
+            long size = endData.readULong(); // size of the HCI packet
+            HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
+            short eventCode = endData.readUChar();
+            short payloadLength = endData.readUChar();
 
-            Event event = build(eventCode);
+            Event event = build(eventCode, endData);
 
             hciMsg = event;
         }
@@ -43,18 +46,38 @@ public class EventDecoder {
         return hciMsg;
     }
 
-    private Event build(short eventCode)
+    private Event build(short eventCode, IoMessage data)
     {
         Event event;
 
         switch (eventCode)
         {
-            case 0x01 -> event = new EventInquiryComplete();
-            case 0x0E -> event = new EventCommandComplete();
+            case 0x0E -> event = buildCommandComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: {}",eventCode));
         }
 
+        return event;
+    }
+
+    private EventCommandComplete buildCommandComplete(IoMessage data)
+    {
+        EventCommandComplete event;
+        short numHciCommandPackets = data.readUChar();
+        int commandOpcode = data.readUShort();
+        switch(commandOpcode)
+        {
+            case 0x0C24 -> event = buildWriteClassOfDeviceComplete(data);
+            default -> throw new UnsupportedOperationException(
+                    String.format("Command Opcode : 0x%04X",commandOpcode));
+        }
+        return event;
+    }
+
+    private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoMessage data)
+    {
+        WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
+        event.setStatus(ErrorCode.getErrorCode(data.readUChar()));
         return event;
     }
 }
