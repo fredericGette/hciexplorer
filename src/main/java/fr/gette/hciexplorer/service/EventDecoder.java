@@ -4,7 +4,6 @@ import fr.gette.hciexplorer.entity.BeginReadRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
-import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.EventCommandComplete;
@@ -32,9 +31,7 @@ public class EventDecoder {
             short eventCode = endData.readUChar();
             short payloadLength = endData.readUChar();
 
-            Event event = build(eventCode, endData);
-
-            hciMsg = event;
+            hciMsg = build(eventCode, endData);
         }
         else
         {
@@ -54,7 +51,7 @@ public class EventDecoder {
         {
             case 0x0E -> event = buildCommandComplete(data);
             default -> throw new UnsupportedOperationException(
-                    String.format("Event code: {}",eventCode));
+                    String.format("Event code: 0x%02X",eventCode));
         }
 
         return event;
@@ -71,6 +68,7 @@ public class EventDecoder {
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : 0x%04X",commandOpcode));
         }
+        event.setNumHciCommandPackets(numHciCommandPackets);
         return event;
     }
 
