@@ -1,9 +1,12 @@
 package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.entity.BeginReadRawMessage;
+import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
+import fr.gette.hciexplorer.entity.EndWriteRawMessage;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
 import fr.gette.hciexplorer.repository.EndReadRawMessageRepository;
@@ -17,7 +20,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MessageDecoder {
+class MessageDecoder {
 
     private final BeginReadRawMessageRepository beginReadRawMessageRepository;
     private final BeginWriteRawMessageRepository beginWriteRawMessageRepository;
@@ -27,18 +30,46 @@ public class MessageDecoder {
     private final DataDecoder dataDecoder;
     private final CommandDecoder commandDecoder;
 
-    public HciMessage decodeReadMessage(Long id) {
+    HciMessage decodeReadMessage(Long id) {
         BeginReadRawMessage begin = beginReadRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
         EndReadRawMessage end = endReadRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
         return decode(begin, end);
     }
 
+    HciMessage decodeWriteMessage(Long id) {
+        BeginWriteRawMessage begin = beginWriteRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        EndWriteRawMessage end = endWriteRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return decode(begin, end);
+    }
 
-    public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
+
+    private HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
     {
         HciMessage hciMsg;
 
-        IoMessage beginData = new IoMessage(begin.getInputBuffer());
+        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        // The message contains only one information: the type of the HCI packet.
+        HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.readULong());
+
+        switch (hciPacketTypeBegin)
+        {
+            case AclData -> hciMsg = dataDecoder.decode(begin, end);
+            case Event -> hciMsg = eventDecoder.decode(begin, end);
+            default -> throw new UnsupportedOperationException(
+                    String.format("HCI packet type: %s",hciPacketTypeBegin));
+        }
+
+        hciMsg.setBeginTimestamp(begin.getTimestamp());
+        hciMsg.setEndTimestamp(end.getTimestamp());
+
+        return hciMsg;
+    }
+
+    private HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end)
+    {
+        HciMessage hciMsg;
+
+        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
         // The message contains only one information: the type of the HCI packet.
         HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.readULong());
 
@@ -46,10 +77,12 @@ public class MessageDecoder {
         {
             case Command -> hciMsg = commandDecoder.decode(begin, end);
             case AclData -> hciMsg = dataDecoder.decode(begin, end);
-            case Event -> hciMsg = eventDecoder.decode(begin, end);
             default -> throw new UnsupportedOperationException(
                     String.format("HCI packet type: %s",hciPacketTypeBegin));
         }
+
+        hciMsg.setBeginTimestamp(begin.getTimestamp());
+        hciMsg.setEndTimestamp(end.getTimestamp());
 
         return hciMsg;
     }

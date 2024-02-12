@@ -1,11 +1,14 @@
 package fr.gette.hciexplorer.service;
 
-import fr.gette.hciexplorer.entity.BeginReadRawMessage;
+import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
 import fr.gette.hciexplorer.entity.EndRawMessage;
-import fr.gette.hciexplorer.entity.EndReadRawMessage;
-import fr.gette.hciexplorer.hciSpecification.*;
+import fr.gette.hciexplorer.entity.EndWriteRawMessage;
+import fr.gette.hciexplorer.hciSpecification.HciMessage;
+import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
 import fr.gette.hciexplorer.hciSpecification.command.Command;
 import fr.gette.hciexplorer.hciSpecification.command.CommandFailed;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,16 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CommandDecoder {
+class CommandDecoder {
 
-    public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
+    HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end)
     {
         HciMessage hciMsg;
 
-        IoMessage beginData = new IoMessage(begin.getInputBuffer());
+        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
         beginData.readULong(); // remove the type of the HCI packet.
 
-        IoMessage endData = new IoMessage(end.getOutputBuffer());
+        IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
 
         if (EndRawMessage.STATUS_SUCCESS.equals(end.getStatus()))
         {
@@ -39,7 +42,7 @@ public class CommandDecoder {
         else
         {
             CommandFailed commandFailed = new CommandFailed();
-            commandFailed.setErrorCode(end.getStatus());
+            commandFailed.setIoCtlStatus(IoCtlStatus.get(end.getStatus()));
             hciMsg = commandFailed;
         }
 

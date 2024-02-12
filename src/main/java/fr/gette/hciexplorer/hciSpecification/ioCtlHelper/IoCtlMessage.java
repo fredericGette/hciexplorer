@@ -1,26 +1,26 @@
-package fr.gette.hciexplorer.service;
+package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
 
-public class IoMessage {
+public class IoCtlMessage {
     short[] data;
     int offset;
 
-    IoMessage(short[] data) {
+    public IoCtlMessage(short[] data) {
         this.data = data;
         offset = 0;
     }
 
-    short readUChar() {
+    public short readUChar() {
         return data[offset++];
     }
 
-    int readUShort() {
+    public int readUShort() {
         int result = 0;
         result += readUChar();
         result += readUChar() << 8;
         return result;
     }
 
-    long readULong() {
+    public long readULong() {
         long result = 0;
         result += readUChar();
         result += readUChar() << 8;

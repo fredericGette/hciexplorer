@@ -11,6 +11,8 @@ import fr.gette.hciexplorer.hciSpecification.event.EventCode;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.EventCommandComplete;
 import fr.gette.hciexplorer.hciSpecification.event.EventFailed;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.WriteClassOfDeviceComplete;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +20,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EventDecoder {
+class EventDecoder {
 
-    public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
+    HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
     {
         HciMessage hciMsg;
 
-        IoMessage endData = new IoMessage(end.getOutputBuffer());
+        IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
 
         if (EndRawMessage.STATUS_SUCCESS.equals(end.getStatus()))
         {
@@ -38,14 +40,14 @@ public class EventDecoder {
         else
         {
             EventFailed eventFailed = new EventFailed();
-            eventFailed.setErrorCode(end.getStatus());
+            eventFailed.setIoCtlStatus(IoCtlStatus.get(end.getStatus()));
             hciMsg = eventFailed;
         }
 
         return hciMsg;
     }
 
-    private Event build(EventCode eventCode, IoMessage data)
+    private Event build(EventCode eventCode, IoCtlMessage data)
     {
         Event event;
 
@@ -59,7 +61,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventCommandComplete buildCommandComplete(IoMessage data)
+    private EventCommandComplete buildCommandComplete(IoCtlMessage data)
     {
         EventCommandComplete event;
         short numHciCommandPackets = data.readUChar();
@@ -74,7 +76,7 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoMessage data)
+    private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoCtlMessage data)
     {
         WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
         event.setStatus(ErrorCode.get(data.readUChar()));

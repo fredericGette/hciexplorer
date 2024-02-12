@@ -1,6 +1,10 @@
 package fr.gette.hciexplorer.hciSpecification.event;
 
+import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public enum EventCode {
@@ -60,16 +64,29 @@ public enum EventCode {
     BLUETOOTH_LOGO_TESTING(0xFE,""),
     VENDOR_SPECIFIC(0xFF,"");
 
-    final int code;
-    final String description;
+    private static final Map<Integer, EventCode> byCode = new HashMap<Integer, EventCode>();
+    static {
+        for (EventCode e : EventCode.values()) {
+            if (byCode.put(e.getCode(), e) != null) {
+                throw new IllegalArgumentException("duplicate code: " + e.getCode());
+            }
+        }
+    }
+
+    public static EventCode get(int code) {
+        return byCode.get(Integer.valueOf(code));
+    }
+
+    private final int code;
+    private final String description;
 
     EventCode(int code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static EventCode get(short code) {
-        return Arrays.stream(values()).filter(value -> value.code == code).findFirst()
-                .orElseThrow(NoSuchElementException::new);
+    private Integer getCode() {
+        return code;
     }
+
 }

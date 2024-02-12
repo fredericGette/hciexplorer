@@ -1,6 +1,10 @@
 package fr.gette.hciexplorer.hciSpecification.command;
 
+import fr.gette.hciexplorer.hciSpecification.event.EventCode;
+
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public enum ErrorCode {
@@ -50,15 +54,25 @@ public enum ErrorCode {
     CONTROLLER_BUSY(0x3A),
     CONNECTION_FAILED_ESTABLISHMENT(0x3E);
 
-    final int code;
+    private static final Map<Integer, ErrorCode> byCode = new HashMap<Integer, ErrorCode>();
+    static {
+        for (ErrorCode e : ErrorCode.values()) {
+            if (byCode.put(e.getCode(), e) != null) {
+                throw new IllegalArgumentException("duplicate code: " + e.getCode());
+            }
+        }
+    }
+
+    public static ErrorCode get(int code) {
+        return byCode.get(Integer.valueOf(code));
+    }
+    private final int code;
 
     ErrorCode(int code) {
         this.code = code;
     }
 
-    public static ErrorCode get(int code)
-    {
-        return Arrays.stream(values()).filter(value -> value.code == code).findFirst()
-                .orElseThrow(NoSuchElementException::new);
+    public int getCode() {
+        return code;
     }
 }

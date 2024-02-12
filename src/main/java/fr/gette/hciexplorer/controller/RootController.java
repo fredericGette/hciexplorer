@@ -1,16 +1,16 @@
 package fr.gette.hciexplorer.controller;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
-import fr.gette.hciexplorer.service.MessageDecoder;
+import fr.gette.hciexplorer.hciSpecification.event.Event;
+import fr.gette.hciexplorer.service.MessageService;
 import fr.gette.hciexplorer.service.Parser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class RootController
 {
 	private final Parser parser;
-	private final MessageDecoder messageDecoder;
+	private final MessageService messageService;
 
 	@PostMapping("/upload")
 	public void uploadFile(@RequestParam("file") MultipartFile file) throws IOException
@@ -31,7 +31,24 @@ public class RootController
 	@ResponseBody
 	public HciMessage getReadMessage(@PathVariable Long id)
 	{
-		HciMessage readMessage = messageDecoder.decodeReadMessage(id);
+		HciMessage readMessage = messageService.getReadMessage(id);
 		return readMessage;
 	}
+
+	@GetMapping("/writeMessage/{id}")
+	@ResponseBody
+	public HciMessage getWriteMessage(@PathVariable Long id)
+	{
+		HciMessage readMessage = messageService.getWriteMessage(id);
+		return readMessage;
+	}
+
+	@GetMapping("/eventMessages")
+	@ResponseBody
+	public List<Event> getEventMessages()
+	{
+		List<Event> events = messageService.getEventMessages();
+		return events;
+	}
+
 }

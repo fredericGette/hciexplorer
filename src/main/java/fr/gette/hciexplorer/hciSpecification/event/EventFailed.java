@@ -2,6 +2,7 @@ package fr.gette.hciexplorer.hciSpecification.event;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EventFailed extends HciMessage {
     private HciPacketType type = HciPacketType.Event;
-    private long errorCode;
+    private IoCtlStatus ioCtlStatus;
 }

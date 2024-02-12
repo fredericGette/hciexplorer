@@ -1,6 +1,8 @@
 package fr.gette.hciexplorer.hciSpecification.command;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public enum CommandCode {
@@ -275,8 +277,20 @@ public enum CommandCode {
     VENDOR_SPECIFIC_CONTROLLER_A2DP_OPCODE(0xFD5D,""),
     VENDOR_SPECIFIC_CONTROLLER_BQR(0xFD5E,"");
 
-    final int code;
-    final String description;
+    private static final Map<Integer, CommandCode> byCode = new HashMap<Integer, CommandCode>();
+    static {
+        for (CommandCode e : CommandCode.values()) {
+            if (byCode.put(e.getCode(), e) != null) {
+                throw new IllegalArgumentException("duplicate code: " + e.getCode());
+            }
+        }
+    }
+
+    public static CommandCode get(Integer code) {
+        return byCode.get(code);
+    }
+    private final int code;
+    private final String description;
 
     CommandCode(int code, String description)
     {
@@ -284,8 +298,7 @@ public enum CommandCode {
         this.description = description;
     }
 
-    public static CommandCode get(int code) {
-        return Arrays.stream(values()).filter(value -> value.code == code).findFirst()
-                .orElseThrow(NoSuchElementException::new);
+    public int getCode() {
+        return code;
     }
 }
