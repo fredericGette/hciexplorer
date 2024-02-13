@@ -54,7 +54,7 @@ public enum ErrorCode {
     CONTROLLER_BUSY(0x3A),
     CONNECTION_FAILED_ESTABLISHMENT(0x3E);
 
-    private static final Map<Integer, ErrorCode> byCode = new HashMap<Integer, ErrorCode>();
+    private static final Map<Integer, ErrorCode> byCode = new HashMap<>();
     static {
         for (ErrorCode e : ErrorCode.values()) {
             if (byCode.put(e.getCode(), e) != null) {

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WriteClassOfDeviceComplete extends EventCommandComplete {
-    private CommandCode commandOpCode = CommandCode.WRITE_CLASS_OF_DEVICE;
+public class ResetComplete extends EventCommandComplete {
+    private CommandCode commandOpCode = CommandCode.RESET;
     private ErrorCode status;
 }

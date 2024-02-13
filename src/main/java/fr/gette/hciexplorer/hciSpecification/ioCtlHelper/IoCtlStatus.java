@@ -7,7 +7,7 @@ public enum IoCtlStatus {
     STATUS_SUCCESS(0x00000000L),
     STATUS_CANCELLED(0xC0000120L);
 
-    private static final Map<Long, IoCtlStatus> byCode = new HashMap<Long, IoCtlStatus>();
+    private static final Map<Long, IoCtlStatus> byCode = new HashMap<>();
     static {
         for (IoCtlStatus e : IoCtlStatus.values()) {
             if (byCode.put(e.getCode(), e) != null) {

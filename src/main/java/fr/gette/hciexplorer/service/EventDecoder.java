@@ -8,9 +8,8 @@ import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
 import fr.gette.hciexplorer.hciSpecification.event.EventCode;
-import fr.gette.hciexplorer.hciSpecification.event.commandComplete.EventCommandComplete;
+import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
 import fr.gette.hciexplorer.hciSpecification.event.EventFailed;
-import fr.gette.hciexplorer.hciSpecification.event.commandComplete.WriteClassOfDeviceComplete;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +67,10 @@ class EventDecoder {
         CommandCode commandOpcode = CommandCode.get(data.readUShort());
         switch(commandOpcode)
         {
-            case CONTROLLER_AND_BASEBAND_WRITE_CLASS_OF_DEVICE -> event = buildWriteClassOfDeviceComplete(data);
+            case WRITE_CLASS_OF_DEVICE -> event = buildWriteClassOfDeviceComplete(data);
+            case RESET -> event = buildResetComplete(data);
+            case READ_BD_ADDR -> event = buildReadBdAddrComplete(data);
+            case READ_LOCAL_SUPPORTED_COMMANDS -> event = buildReadLocalSupportedCommandsComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -80,6 +82,29 @@ class EventDecoder {
     {
         WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
         event.setStatus(ErrorCode.get(data.readUChar()));
+        return event;
+    }
+
+    private ResetComplete buildResetComplete(IoCtlMessage data)
+    {
+        ResetComplete event = new ResetComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        return event;
+    }
+
+    private ReadBdAddrComplete buildReadBdAddrComplete(IoCtlMessage data)
+    {
+        ReadBdAddrComplete event = new ReadBdAddrComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
+
+    private ReadLocalSupportedCommandsComplete buildReadLocalSupportedCommandsComplete(IoCtlMessage data)
+    {
+        ReadLocalSupportedCommandsComplete event = new ReadLocalSupportedCommandsComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setSupportedCommands(new SupportedCommands(data));
         return event;
     }
 }

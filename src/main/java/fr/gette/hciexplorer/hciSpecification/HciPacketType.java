@@ -10,7 +10,7 @@ public enum HciPacketType {
     AclData(0x02),
     Event(0x04);
 
-    private static final Map<Integer, HciPacketType> byValue = new HashMap<Integer, HciPacketType>();
+    private static final Map<Integer, HciPacketType> byValue = new HashMap<>();
     static {
         for (HciPacketType e : HciPacketType.values()) {
             if (byValue.put(e.getValue(), e) != null) {
