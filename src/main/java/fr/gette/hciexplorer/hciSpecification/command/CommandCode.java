@@ -24,7 +24,7 @@ public enum CommandCode {
     AUTHENTICATION_REQUESTED(OpcodeGroupField.LINK_CONTROL,0x0411,"Command to establish authentication between two devices specified by the connection handle."),
     SET_CONNECTION_ENCRYPTION(OpcodeGroupField.LINK_CONTROL,0x0413,"Command to enable or disable the link level encryption."),
     CHANGE_CONNECTION_LINK_KEY(OpcodeGroupField.LINK_CONTROL,0x0415,"Command to force the change of a link key to a new one between two connected devices."),
-    CENTRAL_LINK_KEY(OpcodeGroupField.LINK_CONTROL,0x0417,"Command to force two devices to use the master's link key temporarily."),
+    CENTRAL_LINK_KEY(OpcodeGroupField.LINK_CONTROL,0x0417,"Command to force two devices to use the master's link key temporarily."), // aka Link_Key_Selection
     REMOTE_NAME_REQUEST(OpcodeGroupField.LINK_CONTROL,0x0419,"Command to determine the user friendly name of the connected device."),
     REMOTE_NAME_REQUEST_CANCEL(OpcodeGroupField.LINK_CONTROL,0x041A,""),
     READ_REMOTE_SUPPORTED_FEATURES(OpcodeGroupField.LINK_CONTROL,0x041B,"Command to determine the features supported by the connected device."),

@@ -71,6 +71,8 @@ class EventDecoder {
             case RESET -> event = buildResetComplete(data);
             case READ_BD_ADDR -> event = buildReadBdAddrComplete(data);
             case READ_LOCAL_SUPPORTED_COMMANDS -> event = buildReadLocalSupportedCommandsComplete(data);
+            case READ_BUFFER_SIZE -> event = buildReadBufferSizeComplete(data);
+            case READ_LOCAL_VERSION_INFORMATION -> event = buildReadLocalVersionInformationComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -105,6 +107,29 @@ class EventDecoder {
         ReadLocalSupportedCommandsComplete event = new ReadLocalSupportedCommandsComplete();
         event.setStatus(ErrorCode.get(data.readUChar()));
         event.setSupportedCommands(new SupportedCommands(data));
+        return event;
+    }
+
+    private ReadBufferSizeComplete buildReadBufferSizeComplete(IoCtlMessage data)
+    {
+        ReadBufferSizeComplete event = new ReadBufferSizeComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setAclDataPacketLength(data.readUShort());
+        event.setSynchronousDataPacketLength(data.readUChar());
+        event.setTotalNumACLDataPackets(data.readUShort());
+        event.setTotalNumSynchronousDataPackets(data.readUShort());
+        return event;
+    }
+
+    private ReadLocalVersionInformationComplete buildReadLocalVersionInformationComplete(IoCtlMessage data)
+    {
+        ReadLocalVersionInformationComplete event = new ReadLocalVersionInformationComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setHciVersion(data.readUChar());
+        event.setHciSubversion(data.readUShort());
+        event.setLmpVersion(data.readUChar());
+        event.setCompanyIdentifier(data.readUShort());
+        event.setLmpSubversion(data.readUShort());
         return event;
     }
 }
