@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ class MessageDecoder {
 
     HciMessage decodeReadMessage(Long id) {
         BeginReadRawMessage begin = beginReadRawMessageRepository.findById(id).orElseThrow(()->new NoSuchElementException(String.format("Missing %d", id)));
-        EndReadRawMessage end = endReadRawMessageRepository.findById(id).orElseGet(()->new MissingEndReadRawMessage(id));
+        EndReadRawMessage end = endReadRawMessageRepository.findById(id).orElseGet(()->buildMissingEndReadRawMessage(id));
         return decode(begin, end);
     }
 
@@ -87,8 +89,20 @@ class MessageDecoder {
     private MissingEndReadRawMessage buildMissingEndReadRawMessage(Long id)
     {
         MissingEndReadRawMessage end = new MissingEndReadRawMessage(id);
-        end.setTimestamp(endReadRawMessageRepository.findTopByOrderByTimestampDesc());
+        end.setTimestamp(findMaxTime());
         return end;
+    }
+
+    private ZonedDateTime findMaxTime()
+    {
+        List<ZonedDateTime> lastTimes = new ArrayList<>();
+        ZonedDateTime time0 = ZonedDateTime.of(0,1,1,0,0,0,0, ZoneId.systemDefault());
+        lastTimes.add(Optional.ofNullable(beginReadRawMessageRepository.findFirstByOrderByTimestampDesc()).map(message -> message.getTimestamp()).orElseGet(()->time0));
+        lastTimes.add(Optional.ofNullable(beginWriteRawMessageRepository.findFirstByOrderByTimestampDesc()).map(message -> message.getTimestamp()).orElseGet(()->time0));
+        lastTimes.add(Optional.ofNullable(endReadRawMessageRepository.findFirstByOrderByTimestampDesc()).map(message -> message.getTimestamp()).orElseGet(()->time0));
+        lastTimes.add(Optional.ofNullable(endWriteRawMessageRepository.findFirstByOrderByTimestampDesc()).map(message -> message.getTimestamp()).orElseGet(()->time0));
+
+        return Collections.max(lastTimes);
     }
 
 }

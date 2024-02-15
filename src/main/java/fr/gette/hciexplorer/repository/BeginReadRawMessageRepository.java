@@ -8,4 +8,6 @@ import java.util.List;
 public interface BeginReadRawMessageRepository extends JpaRepository<BeginReadRawMessage, Long>
 {
     List<BeginReadRawMessage> findByOrderByTimestampAsc();
+
+    BeginReadRawMessage findFirstByOrderByTimestampDesc();
 }

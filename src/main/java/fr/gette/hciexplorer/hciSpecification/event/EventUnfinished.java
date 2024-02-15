@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventUnfinished extends HciMessage {
-    private HciPacketType type = HciPacketType.Event;
+public class EventUnfinished extends Event {
     private IoCtlStatus ioCtlStatus;
 }

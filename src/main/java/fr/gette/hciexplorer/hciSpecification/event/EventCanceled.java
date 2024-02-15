@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventCanceled extends HciMessage {
-    private HciPacketType type = HciPacketType.Event;
+public class EventCanceled extends Event {
     private IoCtlStatus ioCtlStatus;
 }

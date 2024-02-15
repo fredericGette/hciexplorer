@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BeginWriteRawMessageRepository extends JpaRepository<BeginWriteRawMessage, Long>
 {
+    BeginWriteRawMessage findFirstByOrderByTimestampDesc();
 }

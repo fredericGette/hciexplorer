@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DataCanceled extends HciMessage {
-    private HciPacketType type = HciPacketType.AclData;
+public class DataCanceled extends Data {
     private IoCtlStatus ioCtlStatus;
 }
