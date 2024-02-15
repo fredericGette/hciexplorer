@@ -1,9 +1,6 @@
 package fr.gette.hciexplorer.service;
 
-import fr.gette.hciexplorer.entity.BeginReadRawMessage;
-import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
-import fr.gette.hciexplorer.entity.EndReadRawMessage;
-import fr.gette.hciexplorer.entity.EndWriteRawMessage;
+import fr.gette.hciexplorer.entity.*;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
@@ -31,8 +28,8 @@ class MessageDecoder {
     private final CommandDecoder commandDecoder;
 
     HciMessage decodeReadMessage(Long id) {
-        BeginReadRawMessage begin = beginReadRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        EndReadRawMessage end = endReadRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        BeginReadRawMessage begin = beginReadRawMessageRepository.findById(id).orElseThrow(()->new NoSuchElementException(String.format("Missing %d", id)));
+        EndReadRawMessage end = endReadRawMessageRepository.findById(id).orElseGet(()->new MissingEndReadRawMessage(id));
         return decode(begin, end);
     }
 
@@ -85,6 +82,13 @@ class MessageDecoder {
         hciMsg.setEndTimestamp(end.getTimestamp());
 
         return hciMsg;
+    }
+
+    private MissingEndReadRawMessage buildMissingEndReadRawMessage(Long id)
+    {
+        MissingEndReadRawMessage end = new MissingEndReadRawMessage(id);
+        end.setTimestamp(endReadRawMessageRepository.findTopByOrderByTimestampDesc());
+        return end;
     }
 
 }

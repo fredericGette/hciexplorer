@@ -1,15 +1,15 @@
 package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.entity.BeginReadRawMessage;
-import fr.gette.hciexplorer.entity.EndRawMessage;
 import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
 import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
 import fr.gette.hciexplorer.hciSpecification.event.EventCode;
+import fr.gette.hciexplorer.hciSpecification.event.EventUnfinished;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
-import fr.gette.hciexplorer.hciSpecification.event.EventFailed;
+import fr.gette.hciexplorer.hciSpecification.event.EventCanceled;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.RequiredArgsConstructor;
@@ -26,21 +26,30 @@ class EventDecoder {
         HciMessage hciMsg;
 
         IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
+        IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
-        if (EndRawMessage.STATUS_SUCCESS.equals(end.getStatus()))
+        switch (ioCtlStatus)
         {
-            long size = endData.readULong(); // size of the HCI packet
-            HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
-            EventCode eventCode = EventCode.get(endData.readUChar());
-            short payloadLength = endData.readUChar();
+            case STATUS_SUCCESS -> {
+                long size = endData.readULong(); // size of the HCI packet
+                HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
+                EventCode eventCode = EventCode.get(endData.readUChar());
+                short payloadLength = endData.readUChar();
 
-            hciMsg = build(eventCode, endData);
-        }
-        else
-        {
-            EventFailed eventFailed = new EventFailed();
-            eventFailed.setIoCtlStatus(IoCtlStatus.get(end.getStatus()));
-            hciMsg = eventFailed;
+                hciMsg = build(eventCode, endData);
+            }
+            case STATUS_CANCELLED -> {
+                EventCanceled eventCanceled = new EventCanceled();
+                eventCanceled.setIoCtlStatus(ioCtlStatus);
+                hciMsg = eventCanceled;
+            }
+            case STATUS_UNFINISHED -> {
+                EventUnfinished eventUnfinished = new EventUnfinished();
+                eventUnfinished.setIoCtlStatus(ioCtlStatus);
+                hciMsg = eventUnfinished;
+            }
+            default -> throw new UnsupportedOperationException(
+                    String.format("Status : %s",ioCtlStatus));
         }
 
         return hciMsg;
@@ -73,6 +82,9 @@ class EventDecoder {
             case READ_LOCAL_SUPPORTED_COMMANDS -> event = buildReadLocalSupportedCommandsComplete(data);
             case READ_BUFFER_SIZE -> event = buildReadBufferSizeComplete(data);
             case READ_LOCAL_VERSION_INFORMATION -> event = buildReadLocalVersionInformationComplete(data);
+            case READ_LOCAL_SUPPORTED_FEATURES -> event = buildReadLocalSupportedFeatureComplete(data);
+            case WRITE_SIMPLE_PAIRING_MODE -> event = buildWriteSimplePairingModeComplete(data);
+            case READ_LOCAL_OOB_DATA -> event = buildReadLocalOobDataComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -130,6 +142,30 @@ class EventDecoder {
         event.setLmpVersion(data.readUChar());
         event.setCompanyIdentifier(data.readUShort());
         event.setLmpSubversion(data.readUShort());
+        return event;
+    }
+
+    private ReadLocalSupportedFeatureComplete buildReadLocalSupportedFeatureComplete(IoCtlMessage data)
+    {
+        ReadLocalSupportedFeatureComplete event = new ReadLocalSupportedFeatureComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setLmpFeatures(new SupportedLmpFeatures(data));
+        return event;
+    }
+
+    private WriteSimplePairingModeComplete buildWriteSimplePairingModeComplete(IoCtlMessage data)
+    {
+        WriteSimplePairingModeComplete event = new WriteSimplePairingModeComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        return event;
+    }
+
+    private ReadLocalOobDataComplete buildReadLocalOobDataComplete(IoCtlMessage data)
+    {
+        ReadLocalOobDataComplete event = new ReadLocalOobDataComplete();
+        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setHashC(data);
+        event.setRandomizerR(data);
         return event;
     }
 }

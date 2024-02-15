@@ -1,4 +1,4 @@
-package fr.gette.hciexplorer.hciSpecification.event;
+package fr.gette.hciexplorer.hciSpecification.data;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventFailed extends HciMessage {
-    private HciPacketType type = HciPacketType.Event;
+public class DataCanceled extends HciMessage {
+    private HciPacketType type = HciPacketType.AclData;
     private IoCtlStatus ioCtlStatus;
 }

@@ -1,4 +1,4 @@
-package fr.gette.hciexplorer.hciSpecification.command;
+package fr.gette.hciexplorer.hciSpecification.event;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommandFailed extends HciMessage {
-    private HciPacketType type = HciPacketType.Command;
+public class EventUnfinished extends HciMessage {
+    private HciPacketType type = HciPacketType.Event;
     private IoCtlStatus ioCtlStatus;
 }

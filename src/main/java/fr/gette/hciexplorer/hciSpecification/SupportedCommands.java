@@ -1,7 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
 import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
-import fr.gette.hciexplorer.hciSpecification.event.EventCode;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,8 +46,8 @@ public class SupportedCommands {
         commandBit.put(CommandCode.HOLD_MODE, 4*8+1);
         commandBit.put(CommandCode.SNIFF_MODE, 4*8+2);
         commandBit.put(CommandCode.EXIT_SNIFF_MODE, 4*8+3);
-        commandBit.put(CommandCode.PARK_MODE, 4*8+4);
-        commandBit.put(CommandCode.EXIT_PARK_MODE, 4*8+5);
+        commandBit.put(CommandCode.PARK_STATE, 4*8+4);
+        commandBit.put(CommandCode.EXIT_PARK_STATE, 4*8+5);
         commandBit.put(CommandCode.QOS_SETUP, 4*8+6);
         commandBit.put(CommandCode.ROLE_DISCOVERY, 4*8+7);
         commandBit.put(CommandCode.SWITCH_ROLE, 5*8+0);
@@ -59,6 +58,28 @@ public class SupportedCommands {
         commandBit.put(CommandCode.FLOW_SPECIFICATION, 5*8+5);
         commandBit.put(CommandCode.SET_EVENT_MASK, 5*8+6);
         commandBit.put(CommandCode.RESET, 5*8+7);
+        commandBit.put(CommandCode.SET_EVENT_FILTER, 6*8+0);
+        commandBit.put(CommandCode.FLUSH, 6*8+1);
+        commandBit.put(CommandCode.READ_PIN_TYPE, 6*8+2);
+        commandBit.put(CommandCode.WRITE_PIN_TYPE, 6*8+3);
+        commandBit.put(CommandCode.CREATE_NEW_UNIT_KEY, 6*8+4);
+        commandBit.put(CommandCode.READ_STORED_LINK_KEY, 6*8+5);
+        commandBit.put(CommandCode.WRITE_STORED_LINK_KEY, 6*8+6);
+        commandBit.put(CommandCode.DELETE_STORED_LINK_KEY, 6*8+7);
+        commandBit.put(CommandCode.WRITE_LOCAL_NAME, 7*8+0);
+        commandBit.put(CommandCode.READ_LOCAL_NAME, 7*8+1);
+        commandBit.put(CommandCode.READ_CONNECTION_ACCEPT_TIMEOUT, 7*8+2);
+        commandBit.put(CommandCode.WRITE_CONNECTION_ACCEPT_TIMEOUT, 7*8+3);
+        commandBit.put(CommandCode.READ_PAGE_TIMEOUT, 7*8+4);
+        commandBit.put(CommandCode.WRITE_PAGE_TIMEOUT, 7*8+5);
+        commandBit.put(CommandCode.READ_SCAN_ENABLE, 7*8+6);
+        commandBit.put(CommandCode.WRITE_SCAN_ENABLE, 7*8+7);
+        commandBit.put(CommandCode.READ_PAGE_SCAN_ACTIVITY, 8*8+0);
+        commandBit.put(CommandCode.WRITE_PAGE_SCAN_ACTIVITY, 8*8+1);
+        commandBit.put(CommandCode.READ_INQUIRY_SCAN_ACTIVITY, 8*8+2);
+        commandBit.put(CommandCode.WRITE_INQUIRY_SCAN_ACTIVITY, 8*8+3);
+        commandBit.put(CommandCode.READ_ENCRYPTION_MODE, 8*8+6);
+        commandBit.put(CommandCode.WRITE_ENCRYPTION_MODE, 8*8+7);
         // ...
     }
 

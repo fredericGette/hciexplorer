@@ -1,9 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification.command;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 public enum CommandCode {
     INQUIRY(OpcodeGroupField.LINK_CONTROL,0x0401,"Command used to enter Inquiry mode where it discovers other Bluetooth devices."),
@@ -49,8 +47,8 @@ public enum CommandCode {
     HOLD_MODE(OpcodeGroupField.LINK_POLICY,0x0801,"Command to place the current or remote device into the Hold mode state."),
     SNIFF_MODE(OpcodeGroupField.LINK_POLICY,0x0803,"Command to place the current or remote device into the Sniff mode state."),
     EXIT_SNIFF_MODE(OpcodeGroupField.LINK_POLICY,0x0804,"Command to exit the current or remote device from the Sniff mode state."),
-    PARK_MODE(OpcodeGroupField.LINK_POLICY,0x0805,"Command to place the current or remote device into the Park mode state."),
-    EXIT_PARK_MODE(OpcodeGroupField.LINK_POLICY,0x0806,"Command to exit the current or remote device from the Park mode state."),
+    PARK_STATE(OpcodeGroupField.LINK_POLICY,0x0805,"Command to place the current or remote device into the Park mode state."),
+    EXIT_PARK_STATE(OpcodeGroupField.LINK_POLICY,0x0806,"Command to exit the current or remote device from the Park mode state."),
     QOS_SETUP(OpcodeGroupField.LINK_POLICY,0x0807,"Command to setup the Quality of Service parameters of the device."),
     ROLE_DISCOVERY(OpcodeGroupField.LINK_POLICY,0x0809,"Command to determine the role of the device for a particular connection."),
     SWITCH_ROLE(OpcodeGroupField.LINK_POLICY,0x080B,"Command to allow the device to switch roles for a particular connection."),

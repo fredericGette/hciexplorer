@@ -5,7 +5,8 @@ import java.util.Map;
 
 public enum IoCtlStatus {
     STATUS_SUCCESS(0x00000000L),
-    STATUS_CANCELLED(0xC0000120L);
+    STATUS_CANCELLED(0xC0000120L),
+    STATUS_UNFINISHED(null);
 
     private static final Map<Long, IoCtlStatus> byCode = new HashMap<>();
     static {
@@ -19,14 +20,14 @@ public enum IoCtlStatus {
         return byCode.get(code);
     }
 
-    private final long code;
+    private final Long code;
 
-    IoCtlStatus(long code)
+    IoCtlStatus(Long code)
     {
         this.code = code;
     }
 
-    long getCode() {
+    Long getCode() {
         return code;
     }
 }
