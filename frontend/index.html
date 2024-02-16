@@ -13,5 +13,22 @@
         </table>
     </form>
 </div>
+<div>
+    <button onclick="downloadEvents()">Events</button>
+</div>
+<div id="divEvents"></div>
+<script type="text/javascript">
+    async function downloadEvents() {
+        debugger;
+        const response = await fetch('http://localhost:8080/eventMessages');
+        const eventMessages = await response.json();
+        console.log(eventMessages);
+        eventMessages.forEach(eventMessage => {
+            const divEvent = document.createElement("div");
+            divEvent.innerHTML += 'Extra stuff';
+            document.getElementById("divEvents").appendChild(divEvent);
+        });
+    }
+</script>
 </body>
 </html>

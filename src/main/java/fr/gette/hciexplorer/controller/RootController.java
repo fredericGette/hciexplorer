@@ -43,6 +43,7 @@ public class RootController
 		return readMessage;
 	}
 
+	@CrossOrigin
 	@GetMapping("/eventMessages")
 	@ResponseBody
 	public List<Event> getEventMessages()
