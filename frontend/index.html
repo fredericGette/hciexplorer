@@ -3,6 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        #events {
+            display: flex;
+            flex-direction: row;
+        }
+
+        #events0 {
+          background-color: linen;
+        }
+
+        #events1 {
+          background-color: orange;
+        }
+
+        .event {
+            border: 1px solid;
+            border-radius: 0.25rlh;
+        }
+
+        .placeholder {
+            border: 1px solid rgba(0,0,0,0);
+        }
+    </style>
 </head>
 <body>
 <div>
@@ -16,17 +39,47 @@
 <div>
     <button onclick="downloadEvents()">Events</button>
 </div>
-<div id="divEvents"></div>
+<div id="events">
+    <div id="events0"></div>
+    <div id="events1"></div>
+</div>
 <script type="text/javascript">
     async function downloadEvents() {
         debugger;
         const response = await fetch('http://localhost:8080/eventMessages');
-        const eventMessages = await response.json();
-        console.log(eventMessages);
-        eventMessages.forEach(eventMessage => {
+        const events = await response.json();
+        console.log(events);
+
+        let last0 = new Date('01 Jan 1970 00:00:00 GMT');
+        let last1 = new Date('01 Jan 1970 00:00:00 GMT');
+        let lastDivEvent0;
+        let height0=2;
+        events.forEach(event => {
+            event.beginTimestamp = new Date(event.beginTimestamp);
+            event.endTimestamp = new Date(event.endTimestamp);
+
             const divEvent = document.createElement("div");
-            divEvent.innerHTML += 'Extra stuff';
-            document.getElementById("divEvents").appendChild(divEvent);
+            divEvent.classList.add('event');
+            divEvent.innerHTML += ''+event.beginTimestamp.getTime()+'<br/>'+event.endTimestamp.getTime()+'';
+
+            const divEmpty = document.createElement("div");
+            divEmpty.classList.add('placeholder');
+            divEmpty.setAttribute("style","height:2rlh");
+
+            if (last0.getTime()<=event.beginTimestamp.getTime())
+            {
+                last0 = event.endTimestamp
+                lastDivEvent0 = divEvent;
+                document.getElementById("events0").appendChild(divEvent);
+                document.getElementById("events1").appendChild(divEmpty);
+            }
+            else
+            {
+                last1 = event.endTimestamp
+                height0 += 2;
+                lastDivEvent0.setAttribute("style","height:"+height0+"rlh");
+                document.getElementById("events1").appendChild(divEvent);
+            }
         });
     }
 </script>
