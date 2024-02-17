@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-        #events {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(26, 1rlh);
-        }
-
         .event {
             border: 1px solid;
             border-radius: 0.25rlh;
@@ -31,60 +25,106 @@
 <div id="events">
 </div>
 <script type="text/javascript">
+    function lastEvent(events, column)
+    {
+        let foundEvent = undefined;
+        events.forEach(event => {
+            if (event.column == column)
+            {
+                foundEvent = event;
+            }
+        });
+        return foundEvent;
+    }
+
     async function downloadEvents() {
         debugger;
         const response = await fetch('http://localhost:8080/eventMessages');
         const events = await response.json();
         console.log(events);
 
-        let last0 = new Date('01 Jan 1970 00:00:00 GMT');
-        let last1 = new Date('01 Jan 1970 00:00:00 GMT');
-        let row0 = -1;
         let row1 = -1;
-        let previousColumn = 0;
-        let eventNumber = 1;
-        let lastDivEvent0;
+        let row2 = -1;
+        let previousEvent = undefined;
+        let defaultHeight = 2;
         events.forEach(event => {
             event.beginTimestamp = new Date(event.beginTimestamp);
             event.endTimestamp = new Date(event.endTimestamp);
+            event.number = previousEvent ? previousEvent.number+1 : 1;
 
-            const divEvent = document.createElement("div");
-            divEvent.classList.add('event');
-            divEvent.innerHTML += ''+eventNumber+' '+event.beginTimestamp.getTime()+'<br/>'+event.endTimestamp.getTime()+'';
-
-            if (last0.getTime()<=event.beginTimestamp.getTime())
+            if (lastEvent(events,1) == undefined || lastEvent(events,1).endTimestamp.getTime()<=event.beginTimestamp.getTime())
             {
-                last0 = event.endTimestamp
-                if (previousColumn==1)
+                if (previousEvent && previousEvent.column==2)
                 {
-                    row0 = row1+2;
+                    if (lastEvent(events,1).endTimestamp.getTime()>lastEvent(events,2).endTimestamp.getTime())
+                    {
+                        lastEvent(events,1).height=row2+defaultHeight+defaultHeight/2-row1;
+                        row1 = row2+defaultHeight+defaultHeight/2;
+                    }
+                    else if (lastEvent(events,1).endTimestamp.getTime()==lastEvent(events,2).endTimestamp.getTime())
+                    {
+                        row1 = row2+defaultHeight;
+                    }
+                    else
+                    {
+                        lastEvent(events,1).height=row2+defaultHeight/2-row1;
+                        row1 = row2+defaultHeight/2;
+                    }
                 }
                 else
                 {
-                    row0+=2;
+                    row1+=defaultHeight;
                 }
-                divEvent.setAttribute("style","grid-column-start: 1; grid-row-start: "+row0+"; grid-row-end: "+(row0+2));
-                lastDivEvent0=divEvent;
-                previousColumn = 0;
+                event.column=1;
+                event.rowStart=row1;
+                event.height=defaultHeight;
             }
             else
             {
-                last1 = event.endTimestamp
-                if (previousColumn==0)
+                if (previousEvent && previousEvent.column==1)
                 {
-                    row1 = row0+1;
+                    row2 = row1+defaultHeight/2;
                 }
                 else
                 {
-                    row1+=2;
+                    row2+=defaultHeight;
                 }
-                divEvent.setAttribute("style","grid-column-start: 2; grid-row-start: "+row1+"; grid-row-end: "+(row1+2));
-                lastDivEvent0.setAttribute("style","grid-column-start: 1; grid-row-start: "+row0+"; grid-row-end: "+(row1+2));
-                previousColumn = 1;
-            }
 
+                lastEvent(events,1).height=row2+defaultHeight;
+
+                event.column=2;
+                event.rowStart=row2;
+                event.height=defaultHeight;
+            }
+            previousEvent = event;
+        });
+
+        let maxRow = 0;
+        events.forEach(event => {
+            if (event.rowStart+event.height > maxRow)
+            {
+                maxRow = event.rowStart+event.height;
+            }
+        });
+
+        const divGrid = document.getElementById("events");
+        divGrid.setAttribute("style","display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat("+maxRow+", 1rlh);");
+
+        events.forEach(event => {
+            const divEvent = document.createElement("div");
+            divEvent.classList.add('event');
+            divEvent.innerHTML += ""+event.number+" "+event.beginTimestamp.getTime();
+            if (event.ioCtlStatus == undefined && event.code=="COMMAND_COMPLETE")
+            {
+                divEvent.innerHTML += " "+event.code+":"+event.commandOpCode
+            }
+            else if (event.ioCtlStatus)
+            {
+                divEvent.innerHTML += " "+event.ioCtlStatus
+            }
+            divEvent.innerHTML += "<br/>"+event.endTimestamp.getTime();
+            divEvent.setAttribute("style","grid-column-start: "+event.column+"; grid-row-start: "+event.rowStart+"; grid-row-end: "+(event.rowStart+event.height));
             document.getElementById("events").appendChild(divEvent);
-            eventNumber++;
         });
     }
 </script>
