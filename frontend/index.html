@@ -5,25 +5,14 @@
     <title>Title</title>
     <style>
         #events {
-            display: flex;
-            flex-direction: row;
-        }
-
-        #events0 {
-          background-color: linen;
-        }
-
-        #events1 {
-          background-color: orange;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(26, 1rlh);
         }
 
         .event {
             border: 1px solid;
             border-radius: 0.25rlh;
-        }
-
-        .placeholder {
-            border: 1px solid rgba(0,0,0,0);
         }
     </style>
 </head>
@@ -40,8 +29,6 @@
     <button onclick="downloadEvents()">Events</button>
 </div>
 <div id="events">
-    <div id="events0"></div>
-    <div id="events1"></div>
 </div>
 <script type="text/javascript">
     async function downloadEvents() {
@@ -52,34 +39,52 @@
 
         let last0 = new Date('01 Jan 1970 00:00:00 GMT');
         let last1 = new Date('01 Jan 1970 00:00:00 GMT');
+        let row0 = -1;
+        let row1 = -1;
+        let previousColumn = 0;
+        let eventNumber = 1;
         let lastDivEvent0;
-        let height0=2;
         events.forEach(event => {
             event.beginTimestamp = new Date(event.beginTimestamp);
             event.endTimestamp = new Date(event.endTimestamp);
 
             const divEvent = document.createElement("div");
             divEvent.classList.add('event');
-            divEvent.innerHTML += ''+event.beginTimestamp.getTime()+'<br/>'+event.endTimestamp.getTime()+'';
-
-            const divEmpty = document.createElement("div");
-            divEmpty.classList.add('placeholder');
-            divEmpty.setAttribute("style","height:2rlh");
+            divEvent.innerHTML += ''+eventNumber+' '+event.beginTimestamp.getTime()+'<br/>'+event.endTimestamp.getTime()+'';
 
             if (last0.getTime()<=event.beginTimestamp.getTime())
             {
                 last0 = event.endTimestamp
-                lastDivEvent0 = divEvent;
-                document.getElementById("events0").appendChild(divEvent);
-                document.getElementById("events1").appendChild(divEmpty);
+                if (previousColumn==1)
+                {
+                    row0 = row1+2;
+                }
+                else
+                {
+                    row0+=2;
+                }
+                divEvent.setAttribute("style","grid-column-start: 1; grid-row-start: "+row0+"; grid-row-end: "+(row0+2));
+                lastDivEvent0=divEvent;
+                previousColumn = 0;
             }
             else
             {
                 last1 = event.endTimestamp
-                height0 += 2;
-                lastDivEvent0.setAttribute("style","height:"+height0+"rlh");
-                document.getElementById("events1").appendChild(divEvent);
+                if (previousColumn==0)
+                {
+                    row1 = row0+1;
+                }
+                else
+                {
+                    row1+=2;
+                }
+                divEvent.setAttribute("style","grid-column-start: 2; grid-row-start: "+row1+"; grid-row-end: "+(row1+2));
+                lastDivEvent0.setAttribute("style","grid-column-start: 1; grid-row-start: "+row0+"; grid-row-end: "+(row1+2));
+                previousColumn = 1;
             }
+
+            document.getElementById("events").appendChild(divEvent);
+            eventNumber++;
         });
     }
 </script>
