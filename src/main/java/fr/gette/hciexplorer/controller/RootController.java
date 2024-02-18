@@ -1,6 +1,7 @@
 package fr.gette.hciexplorer.controller;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
+import fr.gette.hciexplorer.hciSpecification.command.Command;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
 import fr.gette.hciexplorer.service.MessageService;
 import fr.gette.hciexplorer.service.Parser;
@@ -50,6 +51,15 @@ public class RootController
 	{
 		List<Event> events = messageService.getEventMessages();
 		return events;
+	}
+
+	@CrossOrigin
+	@GetMapping("/commandMessages")
+	@ResponseBody
+	public List<Command> getCommandMessages()
+	{
+		List<Command> commands = messageService.getCommandMessages();
+		return commands;
 	}
 
 }

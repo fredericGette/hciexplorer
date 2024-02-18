@@ -1,6 +1,5 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -80,7 +79,7 @@ public class SupportedLmpFeatures {
         value = BigInteger.ZERO;
         for (int i=0; i<8; i++)
         {
-            BigInteger octet = BigInteger.valueOf(data.readUChar()).shiftLeft(i*8);
+            BigInteger octet = BigInteger.valueOf(data.read1octet()).shiftLeft(i*8);
             value = value.add(octet);
         }
     }

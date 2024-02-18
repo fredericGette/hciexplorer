@@ -48,7 +48,7 @@ class MessageDecoder {
 
         IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
         // The message contains only one information: the type of the HCI packet.
-        HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.readULong());
+        HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.read4octets());
 
         switch (hciPacketTypeBegin)
         {
@@ -69,15 +69,15 @@ class MessageDecoder {
         HciMessage hciMsg;
 
         IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
-        // The message contains only one information: the type of the HCI packet.
-        HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.readULong());
+        Long dataLength = beginData.read4octets();
+        HciPacketType hciPacketType = HciPacketType.get(beginData.read1octet());
 
-        switch (hciPacketTypeBegin)
+        switch (hciPacketType)
         {
             case Command -> hciMsg = commandDecoder.decode(begin, end);
             case AclData -> hciMsg = dataDecoder.decode(begin, end);
             default -> throw new UnsupportedOperationException(
-                    String.format("HCI packet type: %s",hciPacketTypeBegin));
+                    String.format("HCI packet type: %s",hciPacketType));
         }
 
         hciMsg.setBeginTimestamp(begin.getTimestamp());

@@ -31,10 +31,10 @@ class EventDecoder {
         switch (ioCtlStatus)
         {
             case STATUS_SUCCESS -> {
-                long size = endData.readULong(); // size of the HCI packet
-                HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
-                EventCode eventCode = EventCode.get(endData.readUChar());
-                short payloadLength = endData.readUChar();
+                long size = endData.read4octets(); // size of the HCI packet
+                HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.read1octet());
+                EventCode eventCode = EventCode.get(endData.read1octet());
+                short payloadLength = endData.read1octet();
 
                 hciMsg = build(eventCode, endData);
             }
@@ -72,8 +72,8 @@ class EventDecoder {
     private EventCommandComplete buildCommandComplete(IoCtlMessage data)
     {
         EventCommandComplete event;
-        short numHciCommandPackets = data.readUChar();
-        CommandCode commandOpcode = CommandCode.get(data.readUShort());
+        short numHciCommandPackets = data.read1octet();
+        CommandCode commandOpcode = CommandCode.get(data.read2octets());
         switch(commandOpcode)
         {
             case WRITE_CLASS_OF_DEVICE -> event = buildWriteClassOfDeviceComplete(data);
@@ -95,21 +95,21 @@ class EventDecoder {
     private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoCtlMessage data)
     {
         WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
     private ResetComplete buildResetComplete(IoCtlMessage data)
     {
         ResetComplete event = new ResetComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
     private ReadBdAddrComplete buildReadBdAddrComplete(IoCtlMessage data)
     {
         ReadBdAddrComplete event = new ReadBdAddrComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         event.setBdAddr(new BluetoothAddress(data));
         return event;
     }
@@ -117,7 +117,7 @@ class EventDecoder {
     private ReadLocalSupportedCommandsComplete buildReadLocalSupportedCommandsComplete(IoCtlMessage data)
     {
         ReadLocalSupportedCommandsComplete event = new ReadLocalSupportedCommandsComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         event.setSupportedCommands(new SupportedCommands(data));
         return event;
     }
@@ -125,30 +125,30 @@ class EventDecoder {
     private ReadBufferSizeComplete buildReadBufferSizeComplete(IoCtlMessage data)
     {
         ReadBufferSizeComplete event = new ReadBufferSizeComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
-        event.setAclDataPacketLength(data.readUShort());
-        event.setSynchronousDataPacketLength(data.readUChar());
-        event.setTotalNumACLDataPackets(data.readUShort());
-        event.setTotalNumSynchronousDataPackets(data.readUShort());
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setAclDataPacketLength(data.read2octets());
+        event.setSynchronousDataPacketLength(data.read1octet());
+        event.setTotalNumACLDataPackets(data.read2octets());
+        event.setTotalNumSynchronousDataPackets(data.read2octets());
         return event;
     }
 
     private ReadLocalVersionInformationComplete buildReadLocalVersionInformationComplete(IoCtlMessage data)
     {
         ReadLocalVersionInformationComplete event = new ReadLocalVersionInformationComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
-        event.setHciVersion(data.readUChar());
-        event.setHciSubversion(data.readUShort());
-        event.setLmpVersion(data.readUChar());
-        event.setCompanyIdentifier(data.readUShort());
-        event.setLmpSubversion(data.readUShort());
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setHciVersion(data.read1octet());
+        event.setHciSubversion(data.read2octets());
+        event.setLmpVersion(data.read1octet());
+        event.setCompanyIdentifier(data.read2octets());
+        event.setLmpSubversion(data.read2octets());
         return event;
     }
 
     private ReadLocalSupportedFeatureComplete buildReadLocalSupportedFeatureComplete(IoCtlMessage data)
     {
         ReadLocalSupportedFeatureComplete event = new ReadLocalSupportedFeatureComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         event.setLmpFeatures(new SupportedLmpFeatures(data));
         return event;
     }
@@ -156,14 +156,14 @@ class EventDecoder {
     private WriteSimplePairingModeComplete buildWriteSimplePairingModeComplete(IoCtlMessage data)
     {
         WriteSimplePairingModeComplete event = new WriteSimplePairingModeComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
     private ReadLocalOobDataComplete buildReadLocalOobDataComplete(IoCtlMessage data)
     {
         ReadLocalOobDataComplete event = new ReadLocalOobDataComplete();
-        event.setStatus(ErrorCode.get(data.readUChar()));
+        event.setStatus(ErrorCode.get(data.read1octet()));
         event.setHashC(data);
         event.setRandomizerR(data);
         return event;

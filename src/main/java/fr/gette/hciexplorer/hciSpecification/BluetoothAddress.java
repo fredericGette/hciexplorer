@@ -2,7 +2,6 @@ package fr.gette.hciexplorer.hciSpecification;
 
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -18,7 +17,7 @@ public class BluetoothAddress {
         value = BigInteger.ZERO;
         for (int i=0; i<6; i++)
         {
-            BigInteger octet = BigInteger.valueOf(data.readUChar()).shiftLeft(i*8);
+            BigInteger octet = BigInteger.valueOf(data.read1octet()).shiftLeft(i*8);
             value = value.add(octet);
         }
     }

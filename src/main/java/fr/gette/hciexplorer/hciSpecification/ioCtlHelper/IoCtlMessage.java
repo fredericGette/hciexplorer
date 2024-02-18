@@ -9,23 +9,32 @@ public class IoCtlMessage {
         offset = 0;
     }
 
-    public short readUChar() {
+    public short read1octet() {
         return data[offset++];
     }
 
-    public int readUShort() {
+    public int read2octets() {
         int result = 0;
-        result += readUChar();
-        result += readUChar() << 8;
+        result += read1octet();
+        result += read1octet() << 8;
         return result;
     }
 
-    public long readULong() {
+    public long read3octets() {
         long result = 0;
-        result += readUChar();
-        result += readUChar() << 8;
-        result += readUChar() << 16;
-        result += readUChar() << 24;
+        result += read1octet();
+        result += read1octet() << 8;
+        result += read1octet() << 16;
+
+        return result;
+    }
+
+    public long read4octets() {
+        long result = 0;
+        result += read1octet();
+        result += read1octet() << 8;
+        result += read1octet() << 16;
+        result += read1octet() << 24;
 
         return result;
     }

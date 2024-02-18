@@ -1,9 +1,12 @@
 package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.entity.BeginReadRawMessage;
+import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
+import fr.gette.hciexplorer.hciSpecification.command.Command;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
 import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
+import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ public class MessageService
 {
     private final MessageDecoder messageDecoder;
     private final BeginReadRawMessageRepository beginReadRawMessageRepository;
+    private final BeginWriteRawMessageRepository beginWriteRawMessageRepository;
 
     public HciMessage getReadMessage(Long id) {
         return messageDecoder.decodeReadMessage(id);
@@ -31,5 +35,11 @@ public class MessageService
         List<BeginReadRawMessage> beginReadRawMessages = beginReadRawMessageRepository.findByOrderByTimestampAsc();
         List<HciMessage> hciMessages = beginReadRawMessages.stream().map(m -> messageDecoder.decodeReadMessage(m.getId())).collect(Collectors.toList());
         return hciMessages.stream().filter(Event.class::isInstance).map(Event.class::cast).collect(Collectors.toList());
+    }
+
+    public List<Command> getCommandMessages() {
+        List<BeginWriteRawMessage> beginReadRawMessages = beginWriteRawMessageRepository.findByOrderByTimestampAsc();
+        List<HciMessage> hciMessages = beginReadRawMessages.stream().map(m -> messageDecoder.decodeWriteMessage(m.getId())).collect(Collectors.toList());
+        return hciMessages.stream().filter(Command.class::isInstance).map(Command.class::cast).collect(Collectors.toList());
     }
 }

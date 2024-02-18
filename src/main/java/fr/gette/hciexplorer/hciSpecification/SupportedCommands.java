@@ -88,7 +88,7 @@ public class SupportedCommands {
         value = BigInteger.ZERO;
         for (int i=0; i<64; i++)
         {
-            BigInteger octet = BigInteger.valueOf(data.readUChar()).shiftLeft(i*8);
+            BigInteger octet = BigInteger.valueOf(data.read1octet()).shiftLeft(i*8);
             value = value.add(octet);
         }
     }

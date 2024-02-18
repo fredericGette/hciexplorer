@@ -23,7 +23,7 @@ public class ReadLocalOobDataComplete extends EventCommandComplete {
         hashC = BigInteger.ZERO;
         for (int i=0; i<16; i++)
         {
-            BigInteger octet = BigInteger.valueOf(data.readUChar()).shiftLeft(i*8);
+            BigInteger octet = BigInteger.valueOf(data.read1octet()).shiftLeft(i*8);
             hashC = hashC.add(octet);
         }
     }
@@ -33,7 +33,7 @@ public class ReadLocalOobDataComplete extends EventCommandComplete {
         randomizerR = BigInteger.ZERO;
         for (int i=0; i<16; i++)
         {
-            BigInteger octet = BigInteger.valueOf(data.readUChar()).shiftLeft(i*8);
+            BigInteger octet = BigInteger.valueOf(data.read1octet()).shiftLeft(i*8);
             randomizerR = randomizerR.add(octet);
         }
     }

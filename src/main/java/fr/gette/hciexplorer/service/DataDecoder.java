@@ -2,9 +2,6 @@ package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.entity.*;
 import fr.gette.hciexplorer.hciSpecification.*;
-import fr.gette.hciexplorer.hciSpecification.command.Command;
-import fr.gette.hciexplorer.hciSpecification.command.CommandCanceled;
-import fr.gette.hciexplorer.hciSpecification.command.CommandUnfinished;
 import fr.gette.hciexplorer.hciSpecification.data.Data;
 import fr.gette.hciexplorer.hciSpecification.data.DataCanceled;
 import fr.gette.hciexplorer.hciSpecification.data.DataUnfinished;
@@ -42,8 +39,8 @@ class DataDecoder {
         switch (ioCtlStatus)
         {
             case STATUS_SUCCESS -> {
-                long size = endData.readULong(); // size of the HCI packet
-                HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.readUChar());
+                long size = endData.read4octets(); // size of the HCI packet
+                HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.read1octet());
 
                 Data data = new Data();
 
