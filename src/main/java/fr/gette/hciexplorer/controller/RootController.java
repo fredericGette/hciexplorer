@@ -45,6 +45,15 @@ public class RootController
 	}
 
 	@CrossOrigin
+	@GetMapping("/messages")
+	@ResponseBody
+	public List<HciMessage> getMessages()
+	{
+		List<HciMessage> messages = messageService.getMessages();
+		return messages;
+	}
+
+	@CrossOrigin
 	@GetMapping("/eventMessages")
 	@ResponseBody
 	public List<Event> getEventMessages()

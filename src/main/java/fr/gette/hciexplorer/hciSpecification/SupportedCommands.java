@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -93,16 +95,24 @@ public class SupportedCommands {
         }
     }
 
-    public boolean isSupported(CommandCode command)
+    private boolean isSupported(CommandCode command)
     {
         int bit = commandBit.get(command);
         return value.testBit(bit);
     }
 
-    @Override
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        commandBit.keySet().forEach(command -> buffer.append(String.format("%s:%s,",command,isSupported(command))));
-        return buffer.toString();
+    public List<CommandCode> getCommands()
+    {
+        List<CommandCode> supportedCommands = new ArrayList<>();
+
+        commandBit.keySet().forEach(command -> {
+            if (isSupported(command))
+            {
+                supportedCommands.add(command);
+            }
+        });
+
+        return supportedCommands;
     }
+
 }

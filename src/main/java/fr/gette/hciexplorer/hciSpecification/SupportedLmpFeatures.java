@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -84,16 +86,24 @@ public class SupportedLmpFeatures {
         }
     }
 
-    public boolean isSupported(LmpFeature command)
+    private boolean isSupported(LmpFeature command)
     {
         int bit = featureBit.get(command);
         return value.testBit(bit);
     }
 
-    @Override
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        featureBit.keySet().forEach(feature -> buffer.append(String.format("%s:%s,",feature,isSupported(feature))));
-        return buffer.toString();
+    public List<LmpFeature> getFeatures()
+    {
+        List<LmpFeature> supportedLmpFeatures = new ArrayList<>();
+
+        featureBit.keySet().forEach(feature -> {
+            if (isSupported(feature))
+            {
+                supportedLmpFeatures.add(feature);
+            }
+        });
+
+        return supportedLmpFeatures;
     }
+
 }

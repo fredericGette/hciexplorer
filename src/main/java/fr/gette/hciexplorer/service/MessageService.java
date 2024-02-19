@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +40,22 @@ public class MessageService
     }
 
     public List<Command> getCommandMessages() {
-        List<BeginWriteRawMessage> beginReadRawMessages = beginWriteRawMessageRepository.findByOrderByTimestampAsc();
-        List<HciMessage> hciMessages = beginReadRawMessages.stream().map(m -> messageDecoder.decodeWriteMessage(m.getId())).collect(Collectors.toList());
+        List<BeginWriteRawMessage> beginWriteRawMessages = beginWriteRawMessageRepository.findByOrderByTimestampAsc();
+        List<HciMessage> hciMessages = beginWriteRawMessages.stream().map(m -> messageDecoder.decodeWriteMessage(m.getId())).collect(Collectors.toList());
         return hciMessages.stream().filter(Command.class::isInstance).map(Command.class::cast).collect(Collectors.toList());
+    }
+
+    public List<HciMessage> getMessages() {
+        List<BeginReadRawMessage> beginReadRawMessages = beginReadRawMessageRepository.findAll();
+        List<HciMessage> readMessages = beginReadRawMessages.stream().map(m -> messageDecoder.decodeReadMessage(m.getId())).collect(Collectors.toList());
+
+        List<BeginWriteRawMessage> beginWriteRawMessages = beginWriteRawMessageRepository.findByOrderByTimestampAsc();
+        List<HciMessage> writeMessages = beginWriteRawMessages.stream().map(m -> messageDecoder.decodeWriteMessage(m.getId())).collect(Collectors.toList());
+
+        List<HciMessage> messages = readMessages;
+        messages.addAll(writeMessages);
+        Collections.sort(messages, Comparator.comparing(HciMessage::getBeginTimestamp));
+
+        return messages;
     }
 }

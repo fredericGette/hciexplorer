@@ -20,54 +20,54 @@
     </form>
 </div>
 <div>
-    <button onclick="downloadEvents()">Events</button>
+    <button onclick="downloadMessages()">Messages</button>
 </div>
-<div id="events">
+<div id="messages">
 </div>
 <script type="text/javascript">
-    function lastEvent(events, column)
+    function lastMessage(messages, column)
     {
-        let foundEvent = undefined;
-        events.forEach(event => {
-            if (event.column == column)
+        let foundMessage = undefined;
+        messages.forEach(message => {
+            if (message.column == column)
             {
-                foundEvent = event;
+                foundMessage = message;
             }
         });
-        return foundEvent;
+        return foundMessage;
     }
 
-    async function downloadEvents() {
+    async function downloadMessages() {
         debugger;
-        const response = await fetch('http://localhost:8080/eventMessages');
-        const events = await response.json();
-        console.log(events);
+        const response = await fetch('http://localhost:8080/messages');
+        const messages = await response.json();
+        console.log(messages);
 
         let row1 = -1;
         let row2 = -1;
-        let previousEvent = undefined;
+        let previousMessage = undefined;
         let defaultHeight = 2;
-        events.forEach(event => {
-            event.beginTimestamp = new Date(event.beginTimestamp);
-            event.endTimestamp = new Date(event.endTimestamp);
-            event.number = previousEvent ? previousEvent.number+1 : 1;
+        messages.forEach(message => {
+            message.beginTimestamp = new Date(message.beginTimestamp);
+            message.endTimestamp = new Date(message.endTimestamp);
+            message.number = previousMessage ? previousMessage.number+1 : 1;
 
-            if (lastEvent(events,1) == undefined || lastEvent(events,1).endTimestamp.getTime()<=event.beginTimestamp.getTime())
+            if (lastMessage(messages,1) == undefined || lastMessage(messages,1).endTimestamp.getTime()<=message.beginTimestamp.getTime())
             {
-                if (previousEvent && previousEvent.column==2)
+                if (previousMessage && previousMessage.column==2)
                 {
-                    if (lastEvent(events,1).endTimestamp.getTime()>lastEvent(events,2).endTimestamp.getTime())
+                    if (lastMessage(messages,1).endTimestamp.getTime()>lastMessage(messages,2).endTimestamp.getTime())
                     {
-                        lastEvent(events,1).height=row2+defaultHeight+defaultHeight/2-row1;
+                        lastMessage(messages,1).height=row2+defaultHeight+defaultHeight/2-row1;
                         row1 = row2+defaultHeight+defaultHeight/2;
                     }
-                    else if (lastEvent(events,1).endTimestamp.getTime()==lastEvent(events,2).endTimestamp.getTime())
+                    else if (lastMessage(messages,1).endTimestamp.getTime()==lastMessage(messages,2).endTimestamp.getTime())
                     {
                         row1 = row2+defaultHeight;
                     }
                     else
                     {
-                        lastEvent(events,1).height=row2+defaultHeight/2-row1;
+                        lastMessage(messages,1).height=row2+defaultHeight/2-row1;
                         row1 = row2+defaultHeight/2;
                     }
                 }
@@ -75,13 +75,13 @@
                 {
                     row1+=defaultHeight;
                 }
-                event.column=1;
-                event.rowStart=row1;
-                event.height=defaultHeight;
+                message.column=1;
+                message.rowStart=row1;
+                message.height=defaultHeight;
             }
             else
             {
-                if (previousEvent && previousEvent.column==1)
+                if (previousMessage && previousMessage.column==1)
                 {
                     row2 = row1+defaultHeight/2;
                 }
@@ -90,41 +90,57 @@
                     row2+=defaultHeight;
                 }
 
-                lastEvent(events,1).height=row2+defaultHeight;
+                lastMessage(messages,1).height=row2+defaultHeight;
 
-                event.column=2;
-                event.rowStart=row2;
-                event.height=defaultHeight;
+                message.column=2;
+                message.rowStart=row2;
+                message.height=defaultHeight;
             }
-            previousEvent = event;
+            previousMessage = message;
         });
 
         let maxRow = 0;
-        events.forEach(event => {
-            if (event.rowStart+event.height > maxRow)
+        messages.forEach(message => {
+            if (message.rowStart+message.height > maxRow)
             {
-                maxRow = event.rowStart+event.height;
+                maxRow = message.rowStart+message.height;
             }
         });
 
-        const divGrid = document.getElementById("events");
+        const divGrid = document.getElementById("messages");
         divGrid.setAttribute("style","display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat("+maxRow+", 1rlh);");
 
-        events.forEach(event => {
-            const divEvent = document.createElement("div");
-            divEvent.classList.add('event');
-            divEvent.innerHTML += ""+event.number+" "+event.beginTimestamp.getTime();
-            if (event.ioCtlStatus == undefined && event.code=="COMMAND_COMPLETE")
+        messages.forEach(message => {
+            const divMessage = document.createElement("div");
+            divMessage.classList.add('event');
+            divMessage.innerHTML += ""+message.number+" "+message.beginTimestamp.getTime()+" ";
+            if (message.type == "Event")
             {
-                divEvent.innerHTML += " "+event.code+":"+event.commandOpCode
+                divMessage.classList.add('event');
+                divMessage.innerHTML += "EVENT";
             }
-            else if (event.ioCtlStatus)
+            else if (message.type == "Command")
             {
-                divEvent.innerHTML += " "+event.ioCtlStatus
+                divMessage.classList.add('event');
+                divMessage.innerHTML += "COMMAND"+" "+message.opCode;
             }
-            divEvent.innerHTML += "<br/>"+event.endTimestamp.getTime();
-            divEvent.setAttribute("style","grid-column-start: "+event.column+"; grid-row-start: "+event.rowStart+"; grid-row-end: "+(event.rowStart+event.height));
-            document.getElementById("events").appendChild(divEvent);
+            else if (message.type == "AclData")
+            {
+                divMessage.classList.add('event');
+                divMessage.innerHTML += "DATA";
+            }
+            divMessage.innerHTML += "<br/>";
+            divMessage.innerHTML += message.endTimestamp.getTime();
+            if (message.ioCtlStatus == undefined && message.code=="COMMAND_COMPLETE")
+            {
+                divMessage.innerHTML += " "+message.code+":"+message.commandOpCode
+            }
+            else if (message.ioCtlStatus)
+            {
+                divMessage.innerHTML += " "+message.ioCtlStatus
+            }
+            divMessage.setAttribute("style","grid-column-start: "+message.column+"; grid-row-start: "+message.rowStart+"; grid-row-end: "+(message.rowStart+message.height));
+            document.getElementById("messages").appendChild(divMessage);
         });
     }
 </script>

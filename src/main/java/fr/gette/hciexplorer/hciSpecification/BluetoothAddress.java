@@ -22,8 +22,7 @@ public class BluetoothAddress {
         }
     }
 
-    @Override
-    public String toString() {
+    public String getString() {
         String string = value.toString(16);
         return string.replaceAll("(.{2})(?!$)", "$1:").toUpperCase();
     }

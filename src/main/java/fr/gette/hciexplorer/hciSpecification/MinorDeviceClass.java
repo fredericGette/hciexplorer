@@ -76,4 +76,8 @@ public enum MinorDeviceClass {
     {
         this.majorDeviceClass = majorDeviceClass;
     }
+
+    public MajorDeviceClass[] getMajorDeviceClass() {
+        return majorDeviceClass;
+    }
 }
