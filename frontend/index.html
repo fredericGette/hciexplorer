@@ -7,6 +7,7 @@
         .event {
             border: 1px solid;
             border-radius: 0.25rlh;
+            font: 0.8rem "Fira Sans", sans-serif;
         }
     </style>
 </head>
@@ -37,20 +38,77 @@
         return foundMessage;
     }
 
+    function shiftDown(messages, i)
+    {
+        for (let j=0; j<i; j++)
+        {
+            messages[j].rowStart += 1;
+        }
+    }
+
+    function add(messages, i)
+    {
+        for (let j=i-1; j>=0; j--)
+        {
+            if (messages[i].beginTimestamp < messages[j].beginTimestamp)
+            {
+                shiftDown(messages, i);
+                messages[i].rowStart = messages[j].rowStart-1;
+            }
+            else if (messages[i].beginTimestamp == messages[j].beginTimestamp)
+            {
+                messages[i].rowStart = messages[j].rowStart;
+                if (messages[i].endTimestamp < messages[j].endTimestamp)
+                {
+                    messages[j].height += 1;
+                }
+                else if (messages[i].endTimestamp == messages[j].endTimestamp)
+                {
+                    messages[j].height += 0;
+                }
+                else if (messages[i].endTimestamp > messages[j].endTimestamp)
+                {
+                    messages[i].height += 1;
+                }
+            }
+            else if (messages[i].beginTimestamp > messages[j].beginTimestamp && messages[i].beginTimestamp < messages[j].endTimestamp)
+            {
+                messages[i].rowStart = messages[j].rowStart + messages[j].height - 1;
+
+                if (messages[i].endTimestamp < messages[j].endTimestamp)
+                {
+                    messages[j].height += 2;
+                }
+                else if (messages[i].endTimestamp == messages[j].endTimestamp)
+                {
+                    messages[j].height += 1;
+                }
+                else if (messages[i].endTimestamp > messages[j].endTimestamp)
+                {
+                    messages[j].height += 0;
+                }
+            }
+            else
+            {
+                messages[i].rowStart = messages[j].rowStart + messages[j].height;
+            }
+        }
+    }
+
     async function downloadMessages() {
         debugger;
         const response = await fetch('http://localhost:8080/messages');
         const messages = await response.json();
         console.log(messages);
 
-        let row1 = -1;
-        let row2 = -1;
-        let previousMessage = undefined;
+        let column = [];
         let defaultHeight = 2;
-        messages.forEach(message => {
-            message.beginTimestamp = new Date(message.beginTimestamp);
-            message.endTimestamp = new Date(message.endTimestamp);
-            message.number = previousMessage ? previousMessage.number+1 : 1;
+        //for (let i=0; i<messages.length; i++)
+        for (let i=0; i<3; i++)
+        {
+            messages[i].beginTimestamp = new Date(messages[i].beginTimestamp).getTime();
+            messages[i].endTimestamp = new Date(messages[i].endTimestamp).getTime();
+            messages[i].number = i;
 
             // Assign column
             // 1: command
@@ -58,69 +116,44 @@
             // 3: other event
             // 4: data
 
-            if (message.type == "Command")
+            if (messages[i].type == "Command")
             {
-                message.column = 1;
+                messages[i].column = 1;
             }
-            else if (message.type == "Event" && message.code=="COMMAND_COMPLETE")
+            else if (messages[i].type == "Event" && messages[i].code=="COMMAND_COMPLETE")
             {
-                message.column = 2;
+                messages[i].column = 2;
             }
-            else if (message.type == "Event")
+            else if (messages[i].type == "Event")
             {
-                message.column = 3;
-            }
-            else
-            {
-                message.column = 4;
-            }
-            
-            if (lastMessage(messages,1) == undefined || lastMessage(messages,1).endTimestamp.getTime()<=message.beginTimestamp.getTime())
-            {
-                if (previousMessage && previousMessage.column==2)
-                {
-                    if (lastMessage(messages,1).endTimestamp.getTime()>lastMessage(messages,2).endTimestamp.getTime())
-                    {
-                        lastMessage(messages,1).height=row2+defaultHeight+defaultHeight/2-row1;
-                        row1 = row2+defaultHeight+defaultHeight/2;
-                    }
-                    else if (lastMessage(messages,1).endTimestamp.getTime()==lastMessage(messages,2).endTimestamp.getTime())
-                    {
-                        row1 = row2+defaultHeight;
-                    }
-                    else
-                    {
-                        lastMessage(messages,1).height=row2+defaultHeight/2-row1;
-                        row1 = row2+defaultHeight/2;
-                    }
-                }
-                else
-                {
-                    row1+=defaultHeight;
-                }
-                message.column=1;
-                message.rowStart=row1;
-                message.height=defaultHeight;
+                messages[i].column = 3;
             }
             else
             {
-                if (previousMessage && previousMessage.column==1)
-                {
-                    row2 = row1+defaultHeight/2;
-                }
-                else
-                {
-                    row2+=defaultHeight;
-                }
-
-                lastMessage(messages,1).height=row2+defaultHeight;
-
-                message.column=2;
-                message.rowStart=row2;
-                message.height=defaultHeight;
+                messages[i].column = 4;
             }
-            previousMessage = message;
-        });
+
+            if (i == 0)
+            {
+                // First message
+                messages[i].rowStart = 1;
+                messages[i].height=defaultHeight;
+            }
+            else
+            {
+                messages[i].height=defaultHeight;
+
+                if (messages[i].beginTimestamp < messages[i-1].endTimestamp && messages[i].column ==  messages[i-1].column)
+                {
+                    messages[i].column = 5;
+                }
+
+                add(messages, i);
+
+            }
+
+            column[messages[i].column] = messages[i];
+        }
 
         let maxRow = 0;
         messages.forEach(message => {
@@ -136,7 +169,7 @@
         messages.forEach(message => {
             const divMessage = document.createElement("div");
             divMessage.classList.add('event');
-            divMessage.innerHTML += ""+message.number+" "+message.beginTimestamp.getTime()+" ";
+            divMessage.innerHTML += ""+message.number+" "+message.beginTimestamp+" ";
             if (message.type == "Event")
             {
                 divMessage.classList.add('event');
@@ -153,7 +186,7 @@
                 divMessage.innerHTML += "DATA";
             }
             divMessage.innerHTML += "<br/>";
-            divMessage.innerHTML += message.endTimestamp.getTime();
+            divMessage.innerHTML += message.endTimestamp;
             if (message.ioCtlStatus == undefined && message.code=="COMMAND_COMPLETE")
             {
                 divMessage.innerHTML += " "+message.code+":"+message.commandOpCode
