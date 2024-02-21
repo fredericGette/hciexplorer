@@ -52,6 +52,29 @@
             message.endTimestamp = new Date(message.endTimestamp);
             message.number = previousMessage ? previousMessage.number+1 : 1;
 
+            // Assign column
+            // 1: command
+            // 2: event command complete
+            // 3: other event
+            // 4: data
+
+            if (message.type == "Command")
+            {
+                message.column = 1;
+            }
+            else if (message.type == "Event" && message.code=="COMMAND_COMPLETE")
+            {
+                message.column = 2;
+            }
+            else if (message.type == "Event")
+            {
+                message.column = 3;
+            }
+            else
+            {
+                message.column = 4;
+            }
+            
             if (lastMessage(messages,1) == undefined || lastMessage(messages,1).endTimestamp.getTime()<=message.beginTimestamp.getTime())
             {
                 if (previousMessage && previousMessage.column==2)
