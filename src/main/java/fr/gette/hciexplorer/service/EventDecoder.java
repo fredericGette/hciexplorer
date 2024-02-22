@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -85,6 +87,15 @@ class EventDecoder {
             case READ_LOCAL_SUPPORTED_FEATURES -> event = buildReadLocalSupportedFeatureComplete(data);
             case WRITE_SIMPLE_PAIRING_MODE -> event = buildWriteSimplePairingModeComplete(data);
             case READ_LOCAL_OOB_DATA -> event = buildReadLocalOobDataComplete(data);
+            case WRITE_SIMPLE_PAIRING_DEBUG_MODE -> event = buildWriteSimplePairingDebugModeComplete(data);
+            case WRITE_AUTHENTICATION_ENABLE -> event = buildWriteAuthenticationEnableComplete(data);
+            case SET_EVENT_MASK -> event = buildSetEventMaskComplete(data);
+            case READ_INQUIRY_RESPONSE_TRANSMIT_POWER_LEVEL -> event = buildReadInquiryResponseTransmitPowerLevelComplete(data);
+            case WRITE_PAGE_TIMEOUT -> event = buildWritePageTimeoutComplete(data);
+            case WRITE_PAGE_SCAN_ACTIVITY -> event = buildWritePageScanActivityComplete(data);
+            case WRITE_PAGE_SCAN_TYPE -> event = buildWritePageScanTypeComplete(data);
+            case WRITE_INQUIRY_SCAN_ACTIVITY -> event = buildWriteInquiryScanActivityComplete(data);
+            case WRITE_INQUIRY_SCAN_TYPE -> event = buildWriteInquiryScanTypeComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -166,6 +177,70 @@ class EventDecoder {
         event.setStatus(ErrorCode.get(data.read1octet()));
         event.setHashC(data);
         event.setRandomizerR(data);
+        return event;
+    }
+
+    private WriteSimplePairingDebugModeComplete buildWriteSimplePairingDebugModeComplete(IoCtlMessage data)
+    {
+        WriteSimplePairingDebugModeComplete event = new WriteSimplePairingDebugModeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteAuthenticationEnableComplete buildWriteAuthenticationEnableComplete(IoCtlMessage data)
+    {
+        WriteAuthenticationEnableComplete event = new WriteAuthenticationEnableComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private SetEventMaskComplete buildSetEventMaskComplete(IoCtlMessage data)
+    {
+        SetEventMaskComplete event = new SetEventMaskComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private ReadInquiryResponseTransmitPowerLevelComplete buildReadInquiryResponseTransmitPowerLevelComplete(IoCtlMessage data)
+    {
+        ReadInquiryResponseTransmitPowerLevelComplete event = new ReadInquiryResponseTransmitPowerLevelComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setTxPower(data.read1signedOctet());
+        return event;
+    }
+
+    private WritePageTimeoutComplete buildWritePageTimeoutComplete(IoCtlMessage data)
+    {
+        WritePageTimeoutComplete event = new WritePageTimeoutComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WritePageTimeoutComplete buildWritePageScanActivityComplete(IoCtlMessage data)
+    {
+        WritePageTimeoutComplete event = new WritePageTimeoutComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WritePageScanTypeComplete buildWritePageScanTypeComplete(IoCtlMessage data)
+    {
+        WritePageScanTypeComplete event = new WritePageScanTypeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteInquiryScanActivityComplete buildWriteInquiryScanActivityComplete(IoCtlMessage data)
+    {
+        WriteInquiryScanActivityComplete event = new WriteInquiryScanActivityComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteInquiryScanTypeComplete buildWriteInquiryScanTypeComplete(IoCtlMessage data)
+    {
+        WriteInquiryScanTypeComplete event = new WriteInquiryScanTypeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 }

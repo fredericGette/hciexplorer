@@ -1,5 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
 
+import java.math.BigInteger;
+
 public class IoCtlMessage {
     short[] data;
     int offset;
@@ -11,6 +13,17 @@ public class IoCtlMessage {
 
     public short read1octet() {
         return data[offset++];
+    }
+
+    public short read1signedOctet()
+    {
+        BigInteger unsigned = BigInteger.valueOf(read1octet());
+        short signed = unsigned.shortValue();
+        if (unsigned.testBit(7))
+        {
+            signed = BigInteger.valueOf(-128).add(unsigned.and(BigInteger.valueOf(127))).shortValue();
+        }
+        return signed;
     }
 
     public int read2octets() {
