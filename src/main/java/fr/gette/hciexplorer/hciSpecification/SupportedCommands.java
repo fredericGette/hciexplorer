@@ -82,6 +82,22 @@ public class SupportedCommands {
         commandBit.put(CommandCode.WRITE_INQUIRY_SCAN_ACTIVITY, 8*8+3);
         commandBit.put(CommandCode.READ_ENCRYPTION_MODE, 8*8+6);
         commandBit.put(CommandCode.WRITE_ENCRYPTION_MODE, 8*8+7);
+        commandBit.put(CommandCode.READ_CLASS_OF_DEVICE, 9*8+0);
+        commandBit.put(CommandCode.WRITE_CLASS_OF_DEVICE, 9*8+1);
+        commandBit.put(CommandCode.READ_VOICE_SETTING, 9*8+2);
+        commandBit.put(CommandCode.WRITE_VOICE_SETTING, 9*8+3);
+        commandBit.put(CommandCode.READ_AUTOMATIC_FLUSH_TIMEOUT, 9*8+4);
+        commandBit.put(CommandCode.WRITE_AUTOMATIC_FLUSH_TIMEOUT, 9*8+5);
+        commandBit.put(CommandCode.READ_NUM_BROADCAST_RETRANSMITS, 9*8+6);
+        commandBit.put(CommandCode.WRITE_NUM_BROADCAST_RETRANSMITS, 9*8+7);
+        commandBit.put(CommandCode.READ_HOLD_MODE_ACTIVITY, 10*8+0);
+        commandBit.put(CommandCode.WRITE_HOLD_MODE_ACTIVITY, 10*8+1);
+        commandBit.put(CommandCode.READ_TRANSMIT_POWER_LEVEL, 10*8+2);
+        commandBit.put(CommandCode.READ_SYNCHRONOUS_FLOW_CONTROL_ENABLE, 10*8+3);
+        commandBit.put(CommandCode.WRITE_SYNCHRONOUS_FLOW_CONTROL_ENABLE, 10*8+4);
+        commandBit.put(CommandCode.SET_CONTROLLER_TO_HOST_FLOW_CONTROL, 10*8+5);
+        commandBit.put(CommandCode.HOST_BUFFER_SIZE, 10*8+6);
+        commandBit.put(CommandCode.HOST_NUM_COMPLETED_PACKETS, 10*8+7);
         // ...
     }
 

@@ -5,18 +5,13 @@ import fr.gette.hciexplorer.entity.EndReadRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
 import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
-import fr.gette.hciexplorer.hciSpecification.event.Event;
-import fr.gette.hciexplorer.hciSpecification.event.EventCode;
-import fr.gette.hciexplorer.hciSpecification.event.EventUnfinished;
+import fr.gette.hciexplorer.hciSpecification.event.*;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
-import fr.gette.hciexplorer.hciSpecification.event.EventCanceled;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.math.BigInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +59,8 @@ class EventDecoder {
         switch (eventCode)
         {
             case COMMAND_COMPLETE -> event = buildCommandComplete(data);
+            case COMMAND_STATUS -> event = buildCommandStatus(data);
+            case CONNECTION_COMPLETE -> event = buildConnectionComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -96,10 +93,42 @@ class EventDecoder {
             case WRITE_PAGE_SCAN_TYPE -> event = buildWritePageScanTypeComplete(data);
             case WRITE_INQUIRY_SCAN_ACTIVITY -> event = buildWriteInquiryScanActivityComplete(data);
             case WRITE_INQUIRY_SCAN_TYPE -> event = buildWriteInquiryScanTypeComplete(data);
+            case WRITE_INQUIRY_MODE -> event = buildWriteInquiryModeComplete(data);
+            case WRITE_EXTENDED_INQUIRY_RESPONSE -> event = buildWriteExtendedInquiryResponseComplete(data);
+            case HOST_BUFFER_SIZE -> event = buildHostBufferSizeComplete(data);
+            case WRITE_LOCAL_NAME -> event = buildWriteLocalNameComplete(data);
+            case LE_READ_LOCAL_SUPPORTED_FEATURES -> event = buildLeReadLocalSupportedFeaturesComplete(data);
+            case LE_READ_SUPPORTED_STATES -> event = buildLeReadSupportedStatesComplete(data);
+            case LE_READ_BUFFER_SIZE_V1 -> event = buildLeReadBufferSizeV1Complete(data);
+            case LE_READ_CONNECT_LIST_SIZE -> event = buildLeReadConnectListSizeComplete(data);
+            case WRITE_LE_HOST_SUPPORT -> event = buildWriteLeHostSupportComplete(data);
+            case LE_READ_ADVERTISING_PHYSICAL_CHANNEL_TX_POWER -> event = buildLeReadAdvertisingPhysicalChannelTxPowerComplete(data);
+            case LE_SET_EVENT_MASK -> event = buildLeSetEventMaskComplete(data);
+            case WRITE_SCAN_ENABLE -> event = buildWriteScanEnableComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
         event.setNumHciCommandPackets(numHciCommandPackets);
+        return event;
+    }
+
+    private EventCommandStatus buildCommandStatus(IoCtlMessage data)
+    {
+        EventCommandStatus event = new EventCommandStatus();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setNumHciCommandPackets(data.read1octet());
+        event.setCommandOpCode(CommandCode.get(data.read2octets()));
+        return event;
+    }
+
+    private EventConnectionComplete buildConnectionComplete(IoCtlMessage data)
+    {
+        EventConnectionComplete event = new EventConnectionComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setBdAddr(new BluetoothAddress(data));
+        event.setLinkType(LinkType.get(data.read1octet()));
+        event.setEncryptionEnabled(EncryptionEnabled.get(data.read1octet()));
         return event;
     }
 
@@ -243,4 +272,95 @@ class EventDecoder {
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
+
+    private WriteInquiryModeComplete buildWriteInquiryModeComplete(IoCtlMessage data)
+    {
+        WriteInquiryModeComplete event = new WriteInquiryModeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteExtendedInquiryResponseComplete buildWriteExtendedInquiryResponseComplete(IoCtlMessage data)
+    {
+        WriteExtendedInquiryResponseComplete event = new WriteExtendedInquiryResponseComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private HostBufferSizeComplete buildHostBufferSizeComplete(IoCtlMessage data)
+    {
+        HostBufferSizeComplete event = new HostBufferSizeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteLocalNameComplete buildWriteLocalNameComplete(IoCtlMessage data)
+    {
+        WriteLocalNameComplete event = new WriteLocalNameComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeReadLocalSupportedFeaturesComplete buildLeReadLocalSupportedFeaturesComplete(IoCtlMessage data)
+    {
+        LeReadLocalSupportedFeaturesComplete event = new LeReadLocalSupportedFeaturesComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setLeFeatures(new SupportedLeFeatures(data));
+        return event;
+    }
+
+    private LeReadSupportedStatesComplete buildLeReadSupportedStatesComplete(IoCtlMessage data)
+    {
+        LeReadSupportedStatesComplete event = new LeReadSupportedStatesComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setLeStates(new SupportedLeStates((data)));
+        return event;
+    }
+
+    private LeReadBufferSizeV1Complete buildLeReadBufferSizeV1Complete(IoCtlMessage data)
+    {
+        LeReadBufferSizeV1Complete event = new LeReadBufferSizeV1Complete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setHcLeDataPacketLength(data.read2octets());
+        event.setHcTotalNumLeDataPackets(data.read1octet());
+        return event;
+    }
+
+    private LeReadConnectListSizeComplete buildLeReadConnectListSizeComplete(IoCtlMessage data)
+    {
+        LeReadConnectListSizeComplete event = new LeReadConnectListSizeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setWhiteListSize(data.read1octet());
+        return event;
+    }
+
+    private WriteLeHostSupportComplete buildWriteLeHostSupportComplete(IoCtlMessage data)
+    {
+        WriteLeHostSupportComplete event = new WriteLeHostSupportComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeReadAdvertisingPhysicalChannelTxPowerComplete buildLeReadAdvertisingPhysicalChannelTxPowerComplete(IoCtlMessage data)
+    {
+        LeReadAdvertisingPhysicalChannelTxPowerComplete event = new LeReadAdvertisingPhysicalChannelTxPowerComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setTransmitPowerLevel(data.read1signedOctet());
+        return event;
+    }
+
+    private LeSetEventMaskComplete buildLeSetEventMaskComplete(IoCtlMessage data)
+    {
+        LeSetEventMaskComplete event = new LeSetEventMaskComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteScanEnableComplete buildWriteScanEnableComplete(IoCtlMessage data)
+    {
+        WriteScanEnableComplete event = new WriteScanEnableComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
 }

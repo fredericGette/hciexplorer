@@ -86,9 +86,9 @@ public class SupportedLmpFeatures {
         }
     }
 
-    private boolean isSupported(LmpFeature command)
+    private boolean isSupported(LmpFeature feature)
     {
-        int bit = featureBit.get(command);
+        int bit = featureBit.get(feature);
         return value.testBit(bit);
     }
 
