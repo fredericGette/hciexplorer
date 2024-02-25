@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -61,6 +64,12 @@ class EventDecoder {
             case COMMAND_COMPLETE -> event = buildCommandComplete(data);
             case COMMAND_STATUS -> event = buildCommandStatus(data);
             case CONNECTION_COMPLETE -> event = buildConnectionComplete(data);
+            case EXTENDED_INQUIRY_RESULT -> event = buildExtendedInquiryResult(data);
+            case INQUIRY_RESULT_WITH_RSSI -> event = buildInquiryResultWithRssi(data);
+            case INQUIRY_COMPLETE -> event = buildInquiryComplete(data);
+            case REMOTE_NAME_REQUEST_COMPLETE -> event = buildRemoteNameRequestComplete(data);
+            case READ_REMOTE_SUPPORTED_FEATURES_COMPLETE -> event = buildReadRemoteSupportedFeaturesComplete(data);
+            case NUMBER_OF_COMPLETED_PACKETS -> event = buildNumberOfCompletedPackets(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -105,6 +114,11 @@ class EventDecoder {
             case LE_READ_ADVERTISING_PHYSICAL_CHANNEL_TX_POWER -> event = buildLeReadAdvertisingPhysicalChannelTxPowerComplete(data);
             case LE_SET_EVENT_MASK -> event = buildLeSetEventMaskComplete(data);
             case WRITE_SCAN_ENABLE -> event = buildWriteScanEnableComplete(data);
+            case WRITE_INQUIRY_TRANSMIT_POWER_LEVEL -> event = buildWriteInquiryTransmitPowerLevelComplete(data);
+            case READ_RSSI -> event = buildReadRssiComplete(data);
+            case ROLE_DISCOVERY -> event = buildRoleDiscoveryComplete(data);
+            case WRITE_AUTOMATIC_FLUSH_TIMEOUT -> event = buildWriteAutomaticFlushTimeoutComplete(data);
+            case READ_TRANSMIT_POWER_LEVEL -> event = buildReadTransmitPowerLevelComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -129,6 +143,83 @@ class EventDecoder {
         event.setBdAddr(new BluetoothAddress(data));
         event.setLinkType(LinkType.get(data.read1octet()));
         event.setEncryptionEnabled(EncryptionEnabled.get(data.read1octet()));
+        return event;
+    }
+
+    private EventExtendedInquiryResult buildExtendedInquiryResult(IoCtlMessage data)
+    {
+        EventExtendedInquiryResult event = new EventExtendedInquiryResult();
+        event.setNumResponses(data.read1octet());
+        event.setBdAddr(new BluetoothAddress(data));
+        event.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
+        data.read1octet(); // reserved
+        event.setClassOfDevice(new ClassOfDevice(data));
+        event.setClockOffset(data.read2octets());
+        event.setRssi(data.read1signedOctet());
+        event.setExtendedInquiryResponse(new ExtendedInquiryResponse(data));
+        return event;
+    }
+
+    private EventInquiryResultWithRssi buildInquiryResultWithRssi(IoCtlMessage data)
+    {
+        EventInquiryResultWithRssi event = new EventInquiryResultWithRssi();
+        event.setNumResponses(data.read1octet());
+        List<EventInquiryResultWithRssi.SingleInquiryResultWithRssi> results = new ArrayList<>();
+        for (int i=0; i<event.getNumResponses(); i++) {
+            EventInquiryResultWithRssi.SingleInquiryResultWithRssi result = new EventInquiryResultWithRssi.SingleInquiryResultWithRssi();
+            result.setBdAddr(new BluetoothAddress(data));
+            result.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
+            data.read1octet(); // reserved
+            result.setClassOfDevice(new ClassOfDevice(data));
+            result.setClockOffset(data.read2octets());
+            result.setRssi(data.read1signedOctet());
+            results.add(result);
+        }
+        event.setInquiryResultWithRssi(results);
+        return event;
+    }
+
+    private EventInquiryComplete buildInquiryComplete(IoCtlMessage data)
+    {
+        EventInquiryComplete event = new EventInquiryComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private EventRemoteNameRequestComplete buildRemoteNameRequestComplete(IoCtlMessage data)
+    {
+        EventRemoteNameRequestComplete event = new EventRemoteNameRequestComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setBdAddr(new BluetoothAddress(data));
+        event.setRemoteName(data.readNullTerminatedString(248));
+        return event;
+    }
+
+    private EventReadRemoteSupportedFeaturesComplete buildReadRemoteSupportedFeaturesComplete(IoCtlMessage data)
+    {
+        EventReadRemoteSupportedFeaturesComplete event = new EventReadRemoteSupportedFeaturesComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setLmpFeatures(new SupportedLmpFeatures(data));
+        return event;
+    }
+
+    private EventNumberOfCompletedPackets buildNumberOfCompletedPackets(IoCtlMessage data)
+    {
+        EventNumberOfCompletedPackets event = new EventNumberOfCompletedPackets();
+        event.setNumberOfHandles(data.read1octet());
+        List<Integer> connectionHandles = new ArrayList<>();
+        for (int i=0; i< event.getNumberOfHandles(); i++)
+        {
+            connectionHandles.add(data.read2octets());
+        }
+        List<Integer> hcNumOfCompletedPackets = new ArrayList<>();
+        for (int i=0; i< event.getNumberOfHandles(); i++)
+        {
+            hcNumOfCompletedPackets.add(data.read2octets());
+        }
+        event.setConnectionHandle(connectionHandles);
+        event.setHcNumOfCompletedPackets(hcNumOfCompletedPackets);
         return event;
     }
 
@@ -363,4 +454,45 @@ class EventDecoder {
         return event;
     }
 
+    private WriteInquiryTransmitPowerLevelComplete buildWriteInquiryTransmitPowerLevelComplete(IoCtlMessage data)
+    {
+        WriteInquiryTransmitPowerLevelComplete event = new WriteInquiryTransmitPowerLevelComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private ReadRssiComplete buildReadRssiComplete(IoCtlMessage data)
+    {
+        ReadRssiComplete event = new ReadRssiComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setHandle(data.read2octets());
+        event.setRssi(data.read1signedOctet());
+        return event;
+    }
+
+    private RoleDiscoveryComplete buildRoleDiscoveryComplete(IoCtlMessage data)
+    {
+        RoleDiscoveryComplete event = new RoleDiscoveryComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setCurrentRole(CurrentRole.get(data.read1octet()));
+        return event;
+    }
+
+    private WriteAutomaticFlushTimeoutComplete buildWriteAutomaticFlushTimeoutComplete(IoCtlMessage data)
+    {
+        WriteAutomaticFlushTimeoutComplete event = new WriteAutomaticFlushTimeoutComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        return event;
+    }
+
+    private ReadTransmitPowerLevelComplete buildReadTransmitPowerLevelComplete(IoCtlMessage data)
+    {
+        ReadTransmitPowerLevelComplete event = new ReadTransmitPowerLevelComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setTransmitPowerLevel(data.read1signedOctet());
+        return event;
+    }
 }

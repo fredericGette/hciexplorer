@@ -51,4 +51,28 @@ public class IoCtlMessage {
 
         return result;
     }
+
+    public String readString(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i=0; i<length; i++)
+        {
+            char c = (char) read1octet();
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    public String readNullTerminatedString(int maxLength) {
+        StringBuilder sb = new StringBuilder(maxLength);
+        for (int i=0; i<maxLength; i++)
+        {
+            char c = (char) read1octet();
+            if (c == 0x00)
+            {
+                break;
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
 }
