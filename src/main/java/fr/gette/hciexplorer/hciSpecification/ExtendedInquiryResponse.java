@@ -8,6 +8,7 @@ import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class ExtendedInquiryResponse {
 
@@ -35,6 +36,7 @@ public class ExtendedInquiryResponse {
                         eir.setTxPowerLevel(data.read1signedOctet());
                         eirData.add(eir);
                     }
+                    default ->  throw new NoSuchElementException(String.format("%s",eirDataType));
                 }
             }
         } while(eirDataStructureLength > 0);

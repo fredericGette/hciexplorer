@@ -1,6 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class IoCtlMessage {
     short[] data;
@@ -74,5 +75,12 @@ public class IoCtlMessage {
             sb.append(c);
         }
         return sb.toString();
+    }
+
+    public short[] readRemaining()
+    {
+        short[] remainingData = Arrays.copyOfRange(data, offset, data.length);
+        offset = data.length;
+        return remainingData;
     }
 }

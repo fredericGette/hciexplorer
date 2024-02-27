@@ -71,6 +71,9 @@ class EventDecoder {
             case READ_REMOTE_SUPPORTED_FEATURES_COMPLETE -> event = buildReadRemoteSupportedFeaturesComplete(data);
             case NUMBER_OF_COMPLETED_PACKETS -> event = buildNumberOfCompletedPackets(data);
             case READ_REMOTE_VERSION_INFORMATION_COMPLETE -> event = buildReadRemoteVersionInformationComplete(data);
+            case READ_CLOCK_OFFSET_COMPLETE -> event = buildReadClockOffsetComplete(data);
+            case QOS_SETUP_COMPLETE -> event = buildQosSetupComplete(data);
+            case DISCONNECTION_COMPLETE -> event = buildDisconnectionComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -122,6 +125,7 @@ class EventDecoder {
             case READ_TRANSMIT_POWER_LEVEL -> event = buildReadTransmitPowerLevelComplete(data);
             case READ_LINK_QUALITY -> event = buildReadLinkQualityComplete(data);
             case READ_LINK_SUPERVISION_TIMEOUT -> event = buildReadLinkSupervisionTimeoutComplete(data);
+            case WRITE_LINK_POLICY_SETTINGS -> event = buildWriteLinkPolicySettingsComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -234,6 +238,38 @@ class EventDecoder {
         event.setVersion(data.read1octet());
         event.setManufacturerName(data.read2octets());
         event.setSubversion(data.read2octets());
+        return event;
+    }
+
+    private EventReadClockOffsetComplete buildReadClockOffsetComplete(IoCtlMessage data)
+    {
+        EventReadClockOffsetComplete event = new EventReadClockOffsetComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setClockOffset(data.read2octets());
+        return event;
+    }
+
+    private EventQosSetupComplete buildQosSetupComplete(IoCtlMessage data)
+    {
+        EventQosSetupComplete event = new EventQosSetupComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setFlags(data.read1octet());
+        event.setServiceType(ServiceType.get(data.read1octet()));
+        event.setTokenRate(data.read4octets());
+        event.setPeakBandwidth(data.read4octets());
+        event.setLatency(data.read4octets());
+        event.setDelayVariation(data.read4octets());
+        return event;
+    }
+
+    private EventDisconnectionComplete buildDisconnectionComplete(IoCtlMessage data)
+    {
+        EventDisconnectionComplete event = new EventDisconnectionComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setReason(ErrorCode.get(data.read1octet()));
         return event;
     }
 
@@ -527,4 +563,13 @@ class EventDecoder {
         event.setLinkSupervisionTimeout(data.read2octets());
         return event;
     }
+
+    private WriteLinkPolicySettingsComplete buildWriteLinkPolicySettingsComplete(IoCtlMessage data)
+    {
+        WriteLinkPolicySettingsComplete event = new WriteLinkPolicySettingsComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        return event;
+    }
+
 }

@@ -5,14 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class WriteSimplePairingMode extends Command {
-    private CommandCode opCode = CommandCode.WRITE_SIMPLE_PAIRING_MODE;
-    private SimplePairingMode simplePairingMode;
-
+public class WriteLocalName extends Command {
+    private CommandCode opCode = CommandCode.WRITE_LOCAL_NAME;
+    private String localName;
 }

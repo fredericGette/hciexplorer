@@ -5,14 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class WriteSimplePairingMode extends Command {
-    private CommandCode opCode = CommandCode.WRITE_SIMPLE_PAIRING_MODE;
-    private SimplePairingMode simplePairingMode;
+public class WritePageTimeout extends Command {
+    private CommandCode opCode = CommandCode.WRITE_PAGE_TIMEOUT;
+    private int pageTimeout;
 
+    public Double getPageTimeoutInMs()
+    {
+        return pageTimeout * 0.625;
+    }
 }
