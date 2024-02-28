@@ -78,6 +78,14 @@ class CommandDecoder {
             case WRITE_EXTENDED_INQUIRY_RESPONSE -> command = buildWriteExtendedInquiryResponse(data);
             case HOST_BUFFER_SIZE -> command = buildHostBufferSize(data);
             case WRITE_LOCAL_NAME -> command = buildWriteLocalName(data);
+            case LE_READ_LOCAL_SUPPORTED_FEATURES -> command = buildLeReadLocalSupportedFeatures(data);
+            case LE_READ_SUPPORTED_STATES -> command = buildLeReadSupportedStates(data);
+            case LE_READ_BUFFER_SIZE_V1 -> command = buildLeReadBufferSizeV1(data);
+            case LE_READ_CONNECT_LIST_SIZE -> command = buildLeReadConnectListSize(data);
+            case WRITE_LE_HOST_SUPPORT -> command = buildWriteLeHostSupport(data);
+            case LE_READ_ADVERTISING_PHYSICAL_CHANNEL_TX_POWER -> command = buildLeReadAdvertisingPhysicalChannelTxPower(data);
+            case LE_SET_EVENT_MASK -> command = buildLeSetEventMask(data);
+            case WRITE_SCAN_ENABLE -> command = buildWriteScanEnable(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -204,6 +212,50 @@ class CommandDecoder {
     private Command buildWriteLocalName(IoCtlMessage data) {
         WriteLocalName command = new WriteLocalName();
         command.setLocalName(data.readNullTerminatedString(248));
+        return command;
+    }
+
+    private Command buildLeReadLocalSupportedFeatures(IoCtlMessage data) {
+        LeReadLocalSupportedFeatures command = new LeReadLocalSupportedFeatures();
+        return command;
+    }
+
+    private Command buildLeReadSupportedStates(IoCtlMessage data) {
+        LeReadSupportedStates command = new LeReadSupportedStates();
+        return command;
+    }
+
+    private Command buildLeReadBufferSizeV1(IoCtlMessage data) {
+        LeReadBufferSizeV1 command = new LeReadBufferSizeV1();
+        return command;
+    }
+
+    private Command buildLeReadConnectListSize(IoCtlMessage data) {
+        LeReadConnectListSize command = new LeReadConnectListSize();
+        return command;
+    }
+
+    private Command buildWriteLeHostSupport(IoCtlMessage data) {
+        WriteLeHostSupport command = new WriteLeHostSupport();
+        command.setLeSupportedHost(LeSupportedHost.get(data.read1octet()));
+        command.setSimultaneousLeHost(SimultaneousLeHost.get(data.read1octet()));
+        return command;
+    }
+
+    private Command buildLeReadAdvertisingPhysicalChannelTxPower(IoCtlMessage data) {
+        LeReadAdvertisingPhysicalChannelTxPower command = new LeReadAdvertisingPhysicalChannelTxPower();
+        return command;
+    }
+
+    private Command buildLeSetEventMask(IoCtlMessage data) {
+        LeSetEventMask command = new LeSetEventMask();
+        command.setLeEventMask(new LeEventMask(data));
+        return command;
+    }
+
+    private Command buildWriteScanEnable(IoCtlMessage data) {
+        WriteScanEnable command = new WriteScanEnable();
+        command.setScanEnable(new ScanEnable(data));
         return command;
     }
 }
