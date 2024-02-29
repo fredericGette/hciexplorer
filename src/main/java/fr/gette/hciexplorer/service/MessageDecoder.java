@@ -3,6 +3,7 @@ package fr.gette.hciexplorer.service;
 import fr.gette.hciexplorer.entity.*;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.UnknownWriteMessage;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
@@ -37,7 +38,7 @@ class MessageDecoder {
 
     HciMessage decodeWriteMessage(Long id) {
         BeginWriteRawMessage begin = beginWriteRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
-        EndWriteRawMessage end = endWriteRawMessageRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        EndWriteRawMessage end = endWriteRawMessageRepository.findById(id).orElseGet(()->buildMissingEndWriteRawMessage(id));
         return decode(begin, end);
     }
 
@@ -52,8 +53,8 @@ class MessageDecoder {
 
         switch (hciPacketTypeBegin)
         {
-            case AclData -> hciMsg = dataDecoder.decode(begin, end);
-            case Event -> hciMsg = eventDecoder.decode(begin, end);
+            case ACLDATA -> hciMsg = dataDecoder.decode(begin, end);
+            case EVENT -> hciMsg = eventDecoder.decode(begin, end);
             default -> throw new UnsupportedOperationException(
                     String.format("HCI packet type: %s",hciPacketTypeBegin));
         }
@@ -72,12 +73,17 @@ class MessageDecoder {
         Long dataLength = beginData.read4octets();
         HciPacketType hciPacketType = HciPacketType.get(beginData.read1octet());
 
-        switch (hciPacketType)
+        if (hciPacketType != null) {
+            switch (hciPacketType) {
+                case COMMAND -> hciMsg = commandDecoder.decode(begin, end);
+                case ACLDATA -> hciMsg = dataDecoder.decode(begin, end);
+                default -> throw new UnsupportedOperationException(
+                        String.format("HCI packet type: %s", hciPacketType));
+            }
+        }
+        else
         {
-            case Command -> hciMsg = commandDecoder.decode(begin, end);
-            case AclData -> hciMsg = dataDecoder.decode(begin, end);
-            default -> throw new UnsupportedOperationException(
-                    String.format("HCI packet type: %s",hciPacketType));
+            hciMsg = new UnknownWriteMessage();
         }
 
         hciMsg.setBeginTimestamp(begin.getTimestamp());
@@ -89,6 +95,13 @@ class MessageDecoder {
     private MissingEndReadRawMessage buildMissingEndReadRawMessage(Long id)
     {
         MissingEndReadRawMessage end = new MissingEndReadRawMessage(id);
+        end.setTimestamp(findMaxTime());
+        return end;
+    }
+
+    private MissingEndWriteRawMessage buildMissingEndWriteRawMessage(Long id)
+    {
+        MissingEndWriteRawMessage end = new MissingEndWriteRawMessage(id);
         end.setTimestamp(findMaxTime());
         return end;
     }

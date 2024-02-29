@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 @Setter
 @NoArgsConstructor
 public class AclData extends HciMessage {
-    private HciPacketType type = HciPacketType.AclData;
+    private HciPacketType type = HciPacketType.ACLDATA;
     private AclDirection direction;
     private int handle;
     private short packetBoundaryFlag;

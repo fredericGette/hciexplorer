@@ -1,14 +1,13 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 public enum HciPacketType {
-    Command(0x01),
-    AclData(0x02),
-    Event(0x04);
+    COMMAND(0x01),
+    ACLDATA(0x02),
+    SCODATA(0x03),
+    EVENT(0x04);
 
     private static final Map<Integer, HciPacketType> byValue = new HashMap<>();
     static {

@@ -86,6 +86,7 @@ class CommandDecoder {
             case LE_READ_ADVERTISING_PHYSICAL_CHANNEL_TX_POWER -> command = buildLeReadAdvertisingPhysicalChannelTxPower(data);
             case LE_SET_EVENT_MASK -> command = buildLeSetEventMask(data);
             case WRITE_SCAN_ENABLE -> command = buildWriteScanEnable(data);
+            case CREATE_CONNECTION -> command = buildCreateConnection(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -256,6 +257,17 @@ class CommandDecoder {
     private Command buildWriteScanEnable(IoCtlMessage data) {
         WriteScanEnable command = new WriteScanEnable();
         command.setScanEnable(new ScanEnable(data));
+        return command;
+    }
+
+    private Command buildCreateConnection(IoCtlMessage data) {
+        CreateConnection command = new CreateConnection();
+        command.setBdAddr(new BluetoothAddress(data));
+        command.setPacketType(new PacketTypeUsable(data));
+        command.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
+        command.setReserved(data.read1octet());
+        command.setClockOffset(new ClockOffset(data));
+        command.setAllowRoleSwitch(AllowRoleSwitch.get(data.read1octet()));
         return command;
     }
 }
