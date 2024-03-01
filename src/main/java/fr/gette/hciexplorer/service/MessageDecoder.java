@@ -70,8 +70,9 @@ class MessageDecoder {
         HciMessage hciMsg;
 
         IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
-        Long dataLength = beginData.read4octets();
-        HciPacketType hciPacketType = HciPacketType.get(beginData.read1octet());
+        long dataLength = beginData.read4octets();
+        short type = beginData.read1octet();
+        HciPacketType hciPacketType = HciPacketType.get(type);
 
         if (hciPacketType != null) {
             switch (hciPacketType) {
@@ -83,7 +84,10 @@ class MessageDecoder {
         }
         else
         {
-            hciMsg = new UnknownWriteMessage();
+            UnknownWriteMessage unknownWriteMessage = new UnknownWriteMessage();
+            unknownWriteMessage.setType(type);
+            unknownWriteMessage.setData(beginData.readRemaining());
+            hciMsg = unknownWriteMessage;
         }
 
         hciMsg.setBeginTimestamp(begin.getTimestamp());

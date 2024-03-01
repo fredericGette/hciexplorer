@@ -54,7 +54,36 @@ class DataDecoder {
 
     HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end)
     {
-        throw new UnsupportedOperationException();
+        HciMessage hciMsg;
+
+        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
+
+        switch (ioCtlStatus)
+        {
+            case STATUS_SUCCESS -> {
+                long size = beginData.read4octets(); // size of the HCI packet
+                HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.read1octet());
+
+                hciMsg = decode(beginData, AclDirection.HOST_TO_CONTROLLER);
+            }
+            case STATUS_CANCELLED -> {
+                AclDataCanceled dataCanceled = new AclDataCanceled();
+                dataCanceled.setIoCtlStatus(ioCtlStatus);
+                dataCanceled.setDirection(AclDirection.HOST_TO_CONTROLLER);
+                hciMsg = dataCanceled;
+            }
+            case STATUS_UNFINISHED -> {
+                AclDataUnfinished dataUnfinished = new AclDataUnfinished();
+                dataUnfinished.setIoCtlStatus(ioCtlStatus);
+                dataUnfinished.setDirection(AclDirection.HOST_TO_CONTROLLER);
+                hciMsg = dataUnfinished;
+            }
+            default -> throw new UnsupportedOperationException(
+                    String.format("Status : %s",ioCtlStatus));
+        }
+
+        return hciMsg;
     }
 
     private AclData decode(IoCtlMessage data, AclDirection direction)

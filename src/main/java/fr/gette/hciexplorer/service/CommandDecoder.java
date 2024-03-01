@@ -87,6 +87,20 @@ class CommandDecoder {
             case LE_SET_EVENT_MASK -> command = buildLeSetEventMask(data);
             case WRITE_SCAN_ENABLE -> command = buildWriteScanEnable(data);
             case CREATE_CONNECTION -> command = buildCreateConnection(data);
+            case WRITE_INQUIRY_TRANSMIT_POWER_LEVEL -> command = buildWriteInquiryTransmitPowerLevel(data);
+            case INQUIRY -> command = buildInquiry(data);
+            case REMOTE_NAME_REQUEST -> command = buildRemoteNameRequest(data);
+            case READ_REMOTE_SUPPORTED_FEATURES -> command = buildReadRemoteSupportedFeatures(data);
+            case READ_RSSI -> command = buildReadRssi(data);
+            case ROLE_DISCOVERY -> command = buildRoleDiscovery(data);
+            case WRITE_AUTOMATIC_FLUSH_TIMEOUT -> command = buildWriteAutomaticFlushTimeout(data);
+            case READ_REMOTE_VERSION_INFORMATION -> command = buildReadRemoteVersionInformation(data);
+            case READ_CLOCK_OFFSET -> command = buildReadClockOffset(data);
+            case READ_TRANSMIT_POWER_LEVEL -> command = buildReadTransmitPowerLevel(data);
+            case READ_LINK_QUALITY -> command = buildReadLinkQuality(data);
+            case READ_LINK_SUPERVISION_TIMEOUT -> command = buildReadLinkSupervisionTimeout(data);
+            case WRITE_LINK_POLICY_SETTINGS -> command = buildWriteLinkPolicySettings(data);
+            case DISCONNECT -> command = buildDisconnect(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -268,6 +282,99 @@ class CommandDecoder {
         command.setReserved(data.read1octet());
         command.setClockOffset(new ClockOffset(data));
         command.setAllowRoleSwitch(AllowRoleSwitch.get(data.read1octet()));
+        return command;
+    }
+
+    private Command buildWriteInquiryTransmitPowerLevel(IoCtlMessage data) {
+        WriteInquiryTransmitPowerLevel command = new WriteInquiryTransmitPowerLevel();
+        command.setTxPower(data.read1signedOctet());
+        return command;
+    }
+
+    private Command buildInquiry(IoCtlMessage data) {
+        Inquiry command = new Inquiry();
+        command.setLap(new LAP(data));
+        command.setInquiryLength(data.read1octet());
+        command.setNumResponses(data.read1octet());
+        return command;
+    }
+
+    private Command buildRemoteNameRequest(IoCtlMessage data) {
+        RemoteNameRequest command = new RemoteNameRequest();
+        command.setBdAddr(new BluetoothAddress(data));
+        command.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
+        command.setReserved(data.read1octet());
+        command.setClockOffset(new ClockOffset(data));
+        return command;
+    }
+
+    private Command buildReadRemoteSupportedFeatures(IoCtlMessage data) {
+        ReadRemoteSupportedFeatures command = new ReadRemoteSupportedFeatures();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildReadRssi(IoCtlMessage data) {
+        ReadRssi command = new ReadRssi();
+        command.setHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildRoleDiscovery(IoCtlMessage data) {
+        RoleDiscovery command = new RoleDiscovery();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildWriteAutomaticFlushTimeout(IoCtlMessage data) {
+        WriteAutomaticFlushTimeout command = new WriteAutomaticFlushTimeout();
+        command.setConnectionHandle(data.read2octets());
+        command.setFlushTimeout(data.read2octets());
+        return command;
+    }
+
+    private Command buildReadRemoteVersionInformation(IoCtlMessage data) {
+        ReadRemoteVersionInformation command = new ReadRemoteVersionInformation();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildReadClockOffset(IoCtlMessage data) {
+        ReadClockOffset command = new ReadClockOffset();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildReadTransmitPowerLevel(IoCtlMessage data) {
+        ReadTransmitPowerLevel command = new ReadTransmitPowerLevel();
+        command.setConnectionHandle(data.read2octets());
+        command.setTransmitPowerLevelType(TransmitPowerLevelType.get(data.read1octet()));
+        return command;
+    }
+
+    private Command buildReadLinkQuality(IoCtlMessage data) {
+        ReadLinkQuality command = new ReadLinkQuality();
+        command.setHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildReadLinkSupervisionTimeout(IoCtlMessage data) {
+        ReadLinkSupervisionTimeout command = new ReadLinkSupervisionTimeout();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildWriteLinkPolicySettings(IoCtlMessage data) {
+        WriteLinkPolicySettings command = new WriteLinkPolicySettings();
+        command.setConnectionHandle(data.read2octets());
+        command.setLinkPolicySettings(new LinkPolicySettings(data));
+        return command;
+    }
+
+    private Command buildDisconnect(IoCtlMessage data) {
+        Disconnect command = new Disconnect();
+        command.setConnectionHandle(data.read2octets());
+        command.setReason(ErrorCode.get(data.read1octet()));
         return command;
     }
 }
