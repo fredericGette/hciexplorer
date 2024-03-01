@@ -59,6 +59,7 @@ class MessageDecoder {
                     String.format("HCI packet type: %s",hciPacketTypeBegin));
         }
 
+        hciMsg.setId(begin.getId());
         hciMsg.setBeginTimestamp(begin.getTimestamp());
         hciMsg.setEndTimestamp(end.getTimestamp());
 
@@ -90,6 +91,7 @@ class MessageDecoder {
             hciMsg = unknownWriteMessage;
         }
 
+        hciMsg.setId(begin.getId());
         hciMsg.setBeginTimestamp(begin.getTimestamp());
         hciMsg.setEndTimestamp(end.getTimestamp());
 

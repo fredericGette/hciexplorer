@@ -9,6 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Command extends HciMessage {
+public abstract class Command extends HciMessage {
     private HciPacketType type = HciPacketType.COMMAND;
+
+    public abstract CommandCode getOpCode();
 }

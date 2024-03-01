@@ -1,5 +1,7 @@
 package fr.gette.hciexplorer.controller;
 
+import fr.gette.hciexplorer.consolided.Bloc;
+import fr.gette.hciexplorer.consolided.CommandBloc;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.command.Command;
 import fr.gette.hciexplorer.hciSpecification.event.Event;
@@ -69,6 +71,15 @@ public class RootController
 	{
 		List<Command> commands = messageService.getCommandMessages();
 		return commands;
+	}
+
+	@CrossOrigin
+	@GetMapping("/blocs")
+	@ResponseBody
+	public List<Bloc> getBlocs()
+	{
+		List<Bloc> blocs = messageService.getConsolidedMessages();
+		return blocs;
 	}
 
 }

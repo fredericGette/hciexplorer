@@ -10,6 +10,8 @@ import java.time.ZonedDateTime;
 @Setter
 @NoArgsConstructor
 public abstract class HciMessage {
+    private long id;
+    private long parentId;
     private ZonedDateTime beginTimestamp;
     private ZonedDateTime endTimestamp;
 }

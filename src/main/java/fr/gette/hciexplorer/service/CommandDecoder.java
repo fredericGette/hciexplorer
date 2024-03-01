@@ -26,21 +26,23 @@ class CommandDecoder {
         IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
+        CommandCode opCode = CommandCode.get(beginData.read2octets());
+        short payloadLength = beginData.read1octet(); // Size of the HCI_Command_Payload
+
         switch (ioCtlStatus)
         {
             case STATUS_SUCCESS -> {
-                CommandCode opCode = CommandCode.get(beginData.read2octets());
-                short payloadLength = beginData.read1octet(); // Size of the HCI_Command_Payload
-
                 hciMsg = build(opCode, beginData);
             }
             case STATUS_CANCELLED -> {
                 CommandCanceled commandCanceled = new CommandCanceled();
+                commandCanceled.setOpCode(opCode);
                 commandCanceled.setIoCtlStatus(ioCtlStatus);
                 hciMsg = commandCanceled;
             }
             case STATUS_UNFINISHED -> {
                 CommandUnfinished commandUnfinished = new CommandUnfinished();
+                commandUnfinished.setOpCode(opCode);
                 commandUnfinished.setIoCtlStatus(ioCtlStatus);
                 hciMsg = commandUnfinished;
             }

@@ -12,4 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EventCanceled extends Event {
     private IoCtlStatus ioCtlStatus;
+
+    @Override
+    public EventCode getCode() {
+        return null;
+    }
 }

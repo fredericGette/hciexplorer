@@ -27,4 +27,6 @@ public abstract class EventCommandComplete extends Event {
         HCI command packets that the Host can send before waiting.
      */
     private short numHciCommandPackets;
+
+    public abstract CommandCode getCommandOpCode();
 }

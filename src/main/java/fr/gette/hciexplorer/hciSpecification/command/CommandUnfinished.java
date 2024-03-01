@@ -11,5 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CommandUnfinished extends Command {
+    private CommandCode opCode;
     private IoCtlStatus ioCtlStatus;
 }
