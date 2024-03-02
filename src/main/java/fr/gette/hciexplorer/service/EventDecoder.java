@@ -74,6 +74,11 @@ class EventDecoder {
             case READ_CLOCK_OFFSET_COMPLETE -> event = buildReadClockOffsetComplete(data);
             case QOS_SETUP_COMPLETE -> event = buildQosSetupComplete(data);
             case DISCONNECTION_COMPLETE -> event = buildDisconnectionComplete(data);
+            case LINK_KEY_REQUEST -> event = buildLinkKeyRequest(data);
+            case PIN_CODE_REQUEST -> event = buildPinCodeRequest(data);
+            case LINK_KEY_NOTIFICATION -> event = buildLinkKeyNotification(data);
+            case AUTHENTICATION_COMPLETE -> event = buildAuthenticationComplete(data);
+            case ENCRYPTION_CHANGE -> event = buildEncryptionChange(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -126,6 +131,9 @@ class EventDecoder {
             case READ_LINK_QUALITY -> event = buildReadLinkQualityComplete(data);
             case READ_LINK_SUPERVISION_TIMEOUT -> event = buildReadLinkSupervisionTimeoutComplete(data);
             case WRITE_LINK_POLICY_SETTINGS -> event = buildWriteLinkPolicySettingsComplete(data);
+            case INQUIRY_CANCEL -> event = buildInquiryCancelComplete(data);
+            case LINK_KEY_REQUEST_NEGATIVE_REPLY -> event = buildLinkKeyRequestNegativeReplyComplete(data);
+            case PIN_CODE_REQUEST_REPLY -> event = buildPinCodeRequestReplyComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -270,6 +278,46 @@ class EventDecoder {
         event.setStatus(ErrorCode.get(data.read1octet()));
         event.setConnectionHandle(data.read2octets());
         event.setReason(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private EventLinkKeyRequest buildLinkKeyRequest(IoCtlMessage data)
+    {
+        EventLinkKeyRequest event = new EventLinkKeyRequest();
+        event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
+
+    private EventPinCodeRequest buildPinCodeRequest(IoCtlMessage data)
+    {
+        EventPinCodeRequest event = new EventPinCodeRequest();
+        event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
+
+    private EventLinkKeyNotification buildLinkKeyNotification(IoCtlMessage data)
+    {
+        EventLinkKeyNotification event = new EventLinkKeyNotification();
+        event.setBdAddr(new BluetoothAddress(data));
+        event.setLinkKey(new LinkKey(data));
+        event.setKeyType(KeyType.get(data.read1octet()));
+        return event;
+    }
+
+    private EventAuthenticationComplete buildAuthenticationComplete(IoCtlMessage data)
+    {
+        EventAuthenticationComplete event = new EventAuthenticationComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        return event;
+    }
+
+    private EventEncryptionChange buildEncryptionChange(IoCtlMessage data)
+    {
+        EventEncryptionChange event = new EventEncryptionChange();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setEncryptionEnabled(EncryptionEnabled.get(data.read1octet()));
         return event;
     }
 
@@ -572,4 +620,26 @@ class EventDecoder {
         return event;
     }
 
+    private InquiryCancelComplete buildInquiryCancelComplete(IoCtlMessage data)
+    {
+        InquiryCancelComplete event = new InquiryCancelComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LinkKeyRequestNegativeReplyComplete buildLinkKeyRequestNegativeReplyComplete(IoCtlMessage data)
+    {
+        LinkKeyRequestNegativeReplyComplete event = new LinkKeyRequestNegativeReplyComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
+
+    private PinCodeRequestReplyComplete buildPinCodeRequestReplyComplete(IoCtlMessage data)
+    {
+        PinCodeRequestReplyComplete event = new PinCodeRequestReplyComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
 }
