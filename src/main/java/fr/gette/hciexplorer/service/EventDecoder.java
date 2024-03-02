@@ -434,9 +434,9 @@ class EventDecoder {
         return event;
     }
 
-    private WritePageTimeoutComplete buildWritePageScanActivityComplete(IoCtlMessage data)
+    private WritePageScanActivityComplete buildWritePageScanActivityComplete(IoCtlMessage data)
     {
-        WritePageTimeoutComplete event = new WritePageTimeoutComplete();
+        WritePageScanActivityComplete event = new WritePageScanActivityComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }

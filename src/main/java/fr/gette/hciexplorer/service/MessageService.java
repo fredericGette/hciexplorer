@@ -156,6 +156,7 @@ public class MessageService {
             case READ_REMOTE_VERSION_INFORMATION -> eventCompleteCode = EventCode.READ_REMOTE_VERSION_INFORMATION_COMPLETE;
             case READ_CLOCK_OFFSET -> eventCompleteCode = EventCode.READ_CLOCK_OFFSET_COMPLETE;
             case DISCONNECT -> eventCompleteCode = EventCode.DISCONNECTION_COMPLETE;
+            case AUTHENTICATION_REQUESTED -> eventCompleteCode = EventCode.AUTHENTICATION_COMPLETE;
         }
 
         if (eventCompleteCode == null) {

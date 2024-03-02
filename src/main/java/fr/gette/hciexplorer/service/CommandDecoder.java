@@ -103,6 +103,11 @@ class CommandDecoder {
             case READ_LINK_SUPERVISION_TIMEOUT -> command = buildReadLinkSupervisionTimeout(data);
             case WRITE_LINK_POLICY_SETTINGS -> command = buildWriteLinkPolicySettings(data);
             case DISCONNECT -> command = buildDisconnect(data);
+            case INQUIRY_CANCEL -> command = buildInquiryCancel(data);
+            case AUTHENTICATION_REQUESTED -> command = buildAuthenticationRequested(data);
+            case LINK_KEY_REQUEST_NEGATIVE_REPLY -> command = buildLinkKeyRequestNegativeReply(data);
+            case PIN_CODE_REQUEST_REPLY -> command = buildPinCodeRequestReply(data);
+            case SET_CONNECTION_ENCRYPTION -> command = buildSetConnectionEncryption(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -377,6 +382,38 @@ class CommandDecoder {
         Disconnect command = new Disconnect();
         command.setConnectionHandle(data.read2octets());
         command.setReason(ErrorCode.get(data.read1octet()));
+        return command;
+    }
+
+    private Command buildInquiryCancel(IoCtlMessage data) {
+        InquiryCancel command = new InquiryCancel();
+        return command;
+    }
+
+    private Command buildAuthenticationRequested(IoCtlMessage data) {
+        AuthenticationRequested command = new AuthenticationRequested();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildLinkKeyRequestNegativeReply(IoCtlMessage data) {
+        LinkKeyRequestNegativeReply command = new LinkKeyRequestNegativeReply();
+        command.setBdAddr(new BluetoothAddress(data));
+        return command;
+    }
+
+    private Command buildPinCodeRequestReply(IoCtlMessage data) {
+        PinCodeRequestReply command = new PinCodeRequestReply();
+        command.setBdAddr(new BluetoothAddress(data));
+        command.setPinCodeLength(data.read1octet());
+        command.setPinCode(data.readRemaining());
+        return command;
+    }
+
+    private Command buildSetConnectionEncryption(IoCtlMessage data) {
+        SetConnectionEncryption command = new SetConnectionEncryption();
+        command.setConnectionHandle(data.read2octets());
+        command.setEncryptionEnable(EncryptionEnabled.get(data.read1octet()));
         return command;
     }
 }

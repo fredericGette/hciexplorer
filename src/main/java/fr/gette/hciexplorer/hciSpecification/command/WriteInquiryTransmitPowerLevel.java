@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class WriteInquiryTransmitPowerLevel extends Command {
-    private CommandCode opCode = CommandCode.WRITE_SIMPLE_PAIRING_MODE;
+    private CommandCode opCode = CommandCode.WRITE_INQUIRY_TRANSMIT_POWER_LEVEL;
     private short TxPower;
 }

@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class WritePageScanTypeComplete extends EventCommandComplete {
-    private CommandCode commandOpCode = CommandCode.WRITE_PAGE_SCAN_ACTIVITY;
+    private CommandCode commandOpCode = CommandCode.WRITE_PAGE_SCAN_TYPE;
     private ErrorCode status;
 }

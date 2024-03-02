@@ -4,27 +4,64 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-        .blocs {
+        #legend {
+            display: flex;
+            flex-direction: column;
+            width: 10rlh
+        }
+
+        #blocs {
             display: flex;
             flex-direction: column;
         }
 
         .bloc {
+            display: flex;
+            flex-direction: column;
             border: 1px solid;
             border-radius: 0.25rlh;
             font: 0.8rem "Fira Sans", sans-serif;
+            padding: 0.25rlh;
         }
 
         .command {
             background-color: #FFC0C0;
         }
 
+        .title {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .id {
+            font-size: 0.7rem;
+            color: rgba(0,0,0,0.5);
+            padding-left: 1rlh;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .content {
+            font-family: monospace;
+            padding-left: 1rlh;
+        }
+
+        .result {
+            font-weight: bold;
+        }
+
         .event {
             background-color: #C0C0FF;
         }
 
-        .data {
-            background-color: #C0FFC0;
+        .HOST_TO_CONTROLLER {
+            background-color: #FFE0E0;
+        }
+
+        .CONTROLLER_TO_HOST {
+            background-color: #E0E0FF;
         }
     </style>
 </head>
@@ -40,9 +77,58 @@
 <div>
     <button onclick="downloadBlocs()">Blocs</button>
 </div>
+<div id="legend">
+    <div class="command">Command</div>
+    <div class="event">Event</div>
+    <div class="CONTROLLER_TO_HOST">Acl data received</div>
+    <div class="HOST_TO_CONTROLLER">Acl data sent</div>
+</div>
 <div id="blocs">
 </div>
 <script type="text/javascript">
+    function getStringProperties(obj) {
+        let result = "";
+        Object.entries(obj).map(([key, value]) => {
+            if (key == "id" || key == "parentId" || key == "beginTimestamp" || key == "endTimestamp" || key == "type" || key == "code" || key == "direction" || key == "data" || key == "dataString" || key == "opCode" || key == "commandOpCode" || key == "status" || key == "ioCtlStatus")
+            {
+                return;
+            }
+            if (typeof value == "object")
+            {
+                result += key + ":<br\>";
+                Object.entries(value).map(([key2, value2]) => {
+                    if (typeof value2 == "object")
+                    {
+                        result += "&nbsp;&nbsp;" + key2 + ":<br\>";
+                        Object.entries(value2).map(([key3, value3]) => {
+                            if (typeof value3 == "object")
+                            {
+                                result += "&nbsp;&nbsp;&nbsp;&nbsp;" + key3 + ":<br\>";
+                                Object.entries(value3).map(([key4, value4]) => {
+                                    result += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + key4 + ":" + value4 + "<br\>";
+                                });
+                            }
+                            else
+                            {
+                                result += "&nbsp;&nbsp;&nbsp;&nbsp;" + key3 + ":" + value3 + "<br\>";
+                            }
+                        });
+                    }
+                    else
+                    {
+                        result += "&nbsp;&nbsp;" + key2 + ":" + value2 + "<br\>";
+                    }
+                });
+            }
+            else
+            {
+                result += key + ":" + value + "<br\>";
+            }
+        });
+
+        return result;
+    }
+
     async function downloadBlocs() {
         debugger;
         const response = await fetch('http://localhost:8080/blocs');
@@ -57,29 +143,121 @@
             if (bloc.command != undefined)
             {
                 divBloc.classList.add('command');
-                divBloc.innerHTML += ""+bloc.command.id+" "+bloc.command.opCode;
 
-                divBloc.innerHTML += "<br/>"
+                const divTitle = document.createElement("div");
+                divTitle.classList.add('title');
+                divBloc.appendChild(divTitle);
+                divTitle.innerHTML += ""+bloc.command.opCode;
+
+                const divId = document.createElement("div");
+                divId.classList.add('id');
+                divBloc.appendChild(divId);
+                divId.innerHTML += ""+bloc.command.id;
+
+                const divContent1 = document.createElement("div");
+                divContent1.classList.add('content');
+                divBloc.appendChild(divContent1);
+                divContent1.innerHTML += getStringProperties(bloc.command);
+
                 if (bloc.status != undefined)
                 {
-                    divBloc.innerHTML += "Status:"+bloc.status.status;
+                    const divStatus = document.createElement("div");
+                    divStatus.classList.add('status');
+                    divBloc.appendChild(divStatus);
+                    divStatus.innerHTML += "Status:"+bloc.status.status;
                 }
 
-                divBloc.innerHTML += "<br/>"
                 if (bloc.result != undefined)
                 {
-                    divBloc.innerHTML += "Result:"+bloc.result.status;
+                    const divResult = document.createElement("div");
+                    divResult.classList.add('result');
+                    divBloc.appendChild(divResult);
+                    divResult.innerHTML += "Result:"+bloc.result.status;
+
+                    const divContent2 = document.createElement("div");
+                    divContent2.classList.add('content');
+                    divBloc.appendChild(divContent2);
+                    divContent2.innerHTML += getStringProperties(bloc.result);
                 }
             }
             else if (bloc.event != undefined)
             {
                 divBloc.classList.add('event');
-                divBloc.innerHTML += ""+bloc.event.id+" "+bloc.event.code;
+
+                if (bloc.event.ioCtlStatus == undefined)
+                {
+                    const divTitle = document.createElement("div");
+                    divTitle.classList.add('title');
+                    divBloc.appendChild(divTitle);
+                    divTitle.innerHTML += ""+bloc.event.code;
+                    if (bloc.event.code == "COMMAND_COMPLETE")
+                    {
+                        divTitle.innerHTML += " "+bloc.event.commandOpCode;
+                    }
+
+                    const divId = document.createElement("div");
+                    divId.classList.add('id');
+                    divBloc.appendChild(divId);
+                    divId.innerHTML += ""+bloc.event.id;
+
+                    if (bloc.event.code == "COMMAND_COMPLETE")
+                    {
+                        const divStatus = document.createElement("div");
+                        divStatus.classList.add('status');
+                        divBloc.appendChild(divStatus);
+                        divStatus.innerHTML += "Status:"+bloc.event.status;
+                    }
+
+                    const divContent1 = document.createElement("div");
+                    divContent1.classList.add('content');
+                    divBloc.appendChild(divContent1);
+                    divContent1.innerHTML += getStringProperties(bloc.event);
+                }
+                else
+                {
+                    const divId = document.createElement("div");
+                    divId.classList.add('id');
+                    divBloc.appendChild(divId);
+                    divId.innerHTML += ""+bloc.event.id;
+
+                    const divStatus = document.createElement("div");
+                    divStatus.classList.add('status');
+                    divBloc.appendChild(divStatus);
+                    divStatus.innerHTML += "IoCtlStatus:"+bloc.event.ioCtlStatus;
+                }
             }
             else if (bloc.data != undefined)
             {
                 divBloc.classList.add('data');
-                divBloc.innerHTML += ""+bloc.data.id+" "+bloc.data.direction;
+                divBloc.classList.add(bloc.data.direction);
+
+                const divTitle = document.createElement("div");
+                divTitle.classList.add('title');
+                divBloc.appendChild(divTitle);
+                divTitle.innerHTML += ""+bloc.data.direction;
+
+                const divId = document.createElement("div");
+                divId.classList.add('id');
+                divBloc.appendChild(divId);
+                divId.innerHTML += ""+bloc.data.id;
+
+                if (bloc.data.ioCtlStatus != undefined)
+                {
+                    const divStatus = document.createElement("div");
+                    divStatus.classList.add('status');
+                    divBloc.appendChild(divStatus);
+                    divStatus.innerHTML += "IoCtlStatus:"+bloc.data.ioCtlStatus;
+                }
+
+                const divContent1 = document.createElement("div");
+                divContent1.classList.add('content');
+                divBloc.appendChild(divContent1);
+                divContent1.innerHTML += ""+bloc.data.dataString;
+
+                const divContent2 = document.createElement("div");
+                divContent2.classList.add('content');
+                divBloc.appendChild(divContent2);
+                divContent2.innerHTML += getStringProperties(bloc.data);
             }
 
             divBlocs.appendChild(divBloc);

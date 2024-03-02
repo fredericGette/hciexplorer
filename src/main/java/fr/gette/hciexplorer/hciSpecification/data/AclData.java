@@ -62,4 +62,21 @@ public class AclData extends HciMessage {
         }
         return description;
     }
+
+    public String getDataString() {
+        StringBuilder valueHexString = new StringBuilder();
+        StringBuilder valueCharString = new StringBuilder();
+        for (int i =0; i<dataTotalLength; i++) {
+            short value = data[i];
+            valueHexString.append(String.format("%02X ", value));
+            if (value > 31 && value < 127) {
+                valueCharString.append((char)value);
+            } else {
+                valueCharString.append('.');
+            }
+        }
+        valueHexString.append(valueCharString);
+        return valueHexString.toString();
+    }
+
 }
