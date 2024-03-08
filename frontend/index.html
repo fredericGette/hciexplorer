@@ -152,7 +152,7 @@
                 const divId = document.createElement("div");
                 divId.classList.add('id');
                 divBloc.appendChild(divId);
-                divId.innerHTML += ""+bloc.command.id;
+                divId.innerHTML += ""+bloc.command.id.toString(16).toUpperCase();
 
                 const divContent1 = document.createElement("div");
                 divContent1.classList.add('content');
@@ -165,6 +165,11 @@
                     divStatus.classList.add('status');
                     divBloc.appendChild(divStatus);
                     divStatus.innerHTML += "Status:"+bloc.status.status;
+
+                    const divIdStatus = document.createElement("div");
+                    divIdStatus.classList.add('id');
+                    divBloc.appendChild(divIdStatus);
+                    divIdStatus.innerHTML += ""+bloc.status.id.toString(16).toUpperCase();
                 }
 
                 if (bloc.result != undefined)
@@ -173,6 +178,11 @@
                     divResult.classList.add('result');
                     divBloc.appendChild(divResult);
                     divResult.innerHTML += "Result:"+bloc.result.status;
+
+                    const divIdResult = document.createElement("div");
+                    divIdResult.classList.add('id');
+                    divBloc.appendChild(divIdResult);
+                    divIdResult.innerHTML += ""+bloc.result.id.toString(16).toUpperCase();
 
                     const divContent2 = document.createElement("div");
                     divContent2.classList.add('content');
@@ -198,7 +208,7 @@
                     const divId = document.createElement("div");
                     divId.classList.add('id');
                     divBloc.appendChild(divId);
-                    divId.innerHTML += ""+bloc.event.id;
+                    divId.innerHTML += ""+bloc.event.id.toString(16).toUpperCase();
 
                     if (bloc.event.code == "COMMAND_COMPLETE")
                     {
@@ -212,13 +222,15 @@
                     divContent1.classList.add('content');
                     divBloc.appendChild(divContent1);
                     divContent1.innerHTML += getStringProperties(bloc.event);
+
+                    if (bloc.event.code == "EXTENDED_INQUIRY_RESULT") console.log(bloc.event)
                 }
                 else
                 {
                     const divId = document.createElement("div");
                     divId.classList.add('id');
                     divBloc.appendChild(divId);
-                    divId.innerHTML += ""+bloc.event.id;
+                    divId.innerHTML += ""+bloc.event.id.toString(16).toUpperCase();
 
                     const divStatus = document.createElement("div");
                     divStatus.classList.add('status');
@@ -239,7 +251,7 @@
                 const divId = document.createElement("div");
                 divId.classList.add('id');
                 divBloc.appendChild(divId);
-                divId.innerHTML += ""+bloc.data.id;
+                divId.innerHTML += ""+bloc.data.id.toString(16).toUpperCase();
 
                 if (bloc.data.ioCtlStatus != undefined)
                 {

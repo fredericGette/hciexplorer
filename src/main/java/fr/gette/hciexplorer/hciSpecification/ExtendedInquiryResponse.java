@@ -5,11 +5,15 @@ import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirDataType
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirTxPowerLevel;
 import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirData;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Getter
+@Setter
 public class ExtendedInquiryResponse {
 
     List<EirData> eirData;
