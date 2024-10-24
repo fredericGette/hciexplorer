@@ -2,6 +2,10 @@ package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HexFormat;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IoCtlMessage {
     short[] data;
@@ -11,6 +15,17 @@ public class IoCtlMessage {
         this.data = data;
         offset = 0;
     }
+
+    public IoCtlMessage(String data) {
+        String[] strings = data.split(" ");
+        List<Short> shorts = Stream.of(strings).map(string -> Short.parseShort(string, 16)).collect(Collectors.toList());
+        this.data = new short[shorts.size()];
+        for (int i=0; i< shorts.size(); i++) {
+            this.data[i] = shorts.get(i);
+        }
+        offset = 0;
+    }
+
 
     public short read1octet() {
         return data[offset++];

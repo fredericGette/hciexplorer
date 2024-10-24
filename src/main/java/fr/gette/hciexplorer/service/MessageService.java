@@ -18,6 +18,7 @@ import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile("database")
 public class MessageService {
     private final MessageDecoder messageDecoder;
     private final BeginReadRawMessageRepository beginReadRawMessageRepository;

@@ -7,6 +7,7 @@ import fr.gette.hciexplorer.repository.EndReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.EndWriteRawMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile("database")
 public class Parser
 {
 	private static final String IOCTL_BTHX_READ_HCI = "0x410413";

@@ -2,7 +2,6 @@ package fr.gette.hciexplorer.hciSpecification.event;
 
 import fr.gette.hciexplorer.hciSpecification.BluetoothAddress;
 import fr.gette.hciexplorer.hciSpecification.ClassOfDevice;
-import fr.gette.hciexplorer.hciSpecification.ExtendedInquiryResponse;
 import fr.gette.hciexplorer.hciSpecification.PageScanRepetitionMode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

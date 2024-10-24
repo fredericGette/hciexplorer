@@ -19,14 +19,25 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class EventDecoder {
+public class EventDecoder {
 
-    HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
+    public HciMessage decode(String data)
     {
-        HciMessage hciMsg;
+        IoCtlMessage endData = new IoCtlMessage(data);
 
+        return decode(endData, IoCtlStatus.STATUS_SUCCESS);
+    }
+
+    public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
+    {
         IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
+
+        return decode(endData, ioCtlStatus);
+    }
+
+    private HciMessage decode(IoCtlMessage endData, IoCtlStatus ioCtlStatus) {
+        HciMessage hciMsg;
 
         switch (ioCtlStatus)
         {

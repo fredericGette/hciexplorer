@@ -11,6 +11,7 @@ import fr.gette.hciexplorer.repository.EndReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.EndWriteRawMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -20,6 +21,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile("database")
 class MessageDecoder {
 
     private final BeginReadRawMessageRepository beginReadRawMessageRepository;
