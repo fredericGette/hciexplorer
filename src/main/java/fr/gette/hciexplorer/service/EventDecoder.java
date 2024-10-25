@@ -44,6 +44,12 @@ public class EventDecoder {
             case STATUS_SUCCESS -> {
                 long size = endData.read4octets(); // size of the HCI packet
                 HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.read1octet());
+                if (!HciPacketType.EVENT.equals(hciPacketTypeEnd))
+                {
+                    throw new IllegalArgumentException(String.format(
+                            "Expected packet type 'EVENT' (0x04), found %s",hciPacketTypeEnd));
+                }
+
                 EventCode eventCode = EventCode.get(endData.read1octet());
                 short payloadLength = endData.read1octet();
 

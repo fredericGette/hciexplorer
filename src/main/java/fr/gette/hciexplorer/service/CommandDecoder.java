@@ -13,18 +13,36 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class CommandDecoder {
+public class CommandDecoder {
 
-    HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end)
+    public HciMessage decode(String data)
     {
+        IoCtlMessage beginData = new IoCtlMessage(data);
+
+        return decode(beginData, IoCtlStatus.STATUS_SUCCESS);
+    }
+
+    public HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end) {
         HciMessage hciMsg;
 
         IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
-        beginData.read4octets(); // remove the data length
-        beginData.read1octet(); // remove the packet type
 
         IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
+
+        return decode(beginData, ioCtlStatus);
+    }
+
+    private HciMessage decode(IoCtlMessage beginData, IoCtlStatus ioCtlStatus) {
+        HciMessage hciMsg;
+
+        beginData.read4octets(); // remove the data length
+        HciPacketType hciPacketType = HciPacketType.get(beginData.read1octet()); // remove the packet type
+        if (!HciPacketType.COMMAND.equals(hciPacketType))
+        {
+            throw new IllegalArgumentException(String.format(
+                    "Expected packet type 'COMMAND' (0x01), found %s",hciPacketType));
+        }
 
         CommandCode opCode = CommandCode.get(beginData.read2octets());
         short payloadLength = beginData.read1octet(); // Size of the HCI_Command_Payload
