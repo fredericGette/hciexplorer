@@ -18,17 +18,15 @@ import java.math.BigInteger;
 @Slf4j
 public class DataDecoder {
 
-    public HciMessage decodeRead(String data)
+    public HciMessage decodeRead(IoCtlMessage endData)
     {
-        IoCtlMessage endData = new IoCtlMessage(data);
-
+        endData.resetOffset();
         return decodeRead(endData, IoCtlStatus.STATUS_SUCCESS);
     }
 
-    public HciMessage decodeWrite(String data)
+    public HciMessage decodeWrite(IoCtlMessage beginData)
     {
-        IoCtlMessage beginData = new IoCtlMessage(data);
-
+        beginData.resetOffset();
         return decodeWrite(beginData, IoCtlStatus.STATUS_SUCCESS);
     }
 
@@ -49,7 +47,7 @@ public class DataDecoder {
             case STATUS_SUCCESS -> {
                 long size = endData.read4octets(); // size of the HCI packet
                 HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.read1octet());
-                if (!HciPacketType.ACLDATA.equals(hciPacketTypeEnd))
+                if (null != hciPacketTypeEnd && !HciPacketType.ACLDATA.equals(hciPacketTypeEnd))
                 {
                     throw new IllegalArgumentException(String.format(
                             "Expected packet type 'ACLDATA' (0x02), found %s",hciPacketTypeEnd));
@@ -92,7 +90,7 @@ public class DataDecoder {
             case STATUS_SUCCESS -> {
                 long size = beginData.read4octets(); // size of the HCI packet
                 HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.read1octet());
-                if (!HciPacketType.ACLDATA.equals(hciPacketTypeBegin))
+                if (null != hciPacketTypeBegin && !HciPacketType.ACLDATA.equals(hciPacketTypeBegin))
                 {
                     throw new IllegalArgumentException(String.format(
                             "Expected packet type 'ACLDATA' (0x02), found %s",hciPacketTypeBegin));

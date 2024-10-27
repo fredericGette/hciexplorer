@@ -15,10 +15,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CommandDecoder {
 
-    public HciMessage decode(String data)
+    public HciMessage decode(IoCtlMessage beginData)
     {
-        IoCtlMessage beginData = new IoCtlMessage(data);
-
+        beginData.resetOffset();
         return decode(beginData, IoCtlStatus.STATUS_SUCCESS);
     }
 
@@ -38,7 +37,7 @@ public class CommandDecoder {
 
         beginData.read4octets(); // remove the data length
         HciPacketType hciPacketType = HciPacketType.get(beginData.read1octet()); // remove the packet type
-        if (!HciPacketType.COMMAND.equals(hciPacketType))
+        if (null != hciPacketType && !HciPacketType.COMMAND.equals(hciPacketType))
         {
             throw new IllegalArgumentException(String.format(
                     "Expected packet type 'COMMAND' (0x01), found %s",hciPacketType));
@@ -126,6 +125,8 @@ public class CommandDecoder {
             case LINK_KEY_REQUEST_NEGATIVE_REPLY -> command = buildLinkKeyRequestNegativeReply(data);
             case PIN_CODE_REQUEST_REPLY -> command = buildPinCodeRequestReply(data);
             case SET_CONNECTION_ENCRYPTION -> command = buildSetConnectionEncryption(data);
+            case EXIT_SNIFF_MODE -> command = buildExitSniffMode(data);
+            case WRITE_LINK_SUPERVISION_TIMEOUT -> command = buildExitSniffMode(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -432,6 +433,20 @@ public class CommandDecoder {
         SetConnectionEncryption command = new SetConnectionEncryption();
         command.setConnectionHandle(data.read2octets());
         command.setEncryptionEnable(EncryptionEnabled.get(data.read1octet()));
+        return command;
+    }
+
+
+    private Command buildExitSniffMode(IoCtlMessage data) {
+        ExitSniffMode command = new ExitSniffMode();
+        command.setConnectionHandle(data.read2octets());
+        return command;
+    }
+
+    private Command buildWriteLinkSupervisionTimeout(IoCtlMessage data) {
+        WriteLinkSupervisionTimeout command = new WriteLinkSupervisionTimeout();
+        command.setConnectionHandle(data.read2octets());
+        command.setLinkSupervisionTimeout(data.read2octets());
         return command;
     }
 }

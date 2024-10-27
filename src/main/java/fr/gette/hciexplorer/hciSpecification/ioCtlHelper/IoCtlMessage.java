@@ -98,4 +98,17 @@ public class IoCtlMessage {
         offset = data.length;
         return remainingData;
     }
+
+    public int getDataLength()
+    {
+        if (data!= null) {
+            return data.length;
+        }
+        return 0;
+    }
+
+    public void resetOffset()
+    {
+        offset = 0;
+    }
 }

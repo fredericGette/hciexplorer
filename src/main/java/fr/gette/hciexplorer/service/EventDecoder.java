@@ -21,10 +21,9 @@ import java.util.List;
 @Slf4j
 public class EventDecoder {
 
-    public HciMessage decode(String data)
+    public HciMessage decode(IoCtlMessage endData)
     {
-        IoCtlMessage endData = new IoCtlMessage(data);
-
+        endData.resetOffset();
         return decode(endData, IoCtlStatus.STATUS_SUCCESS);
     }
 
@@ -44,7 +43,7 @@ public class EventDecoder {
             case STATUS_SUCCESS -> {
                 long size = endData.read4octets(); // size of the HCI packet
                 HciPacketType hciPacketTypeEnd = HciPacketType.get(endData.read1octet());
-                if (!HciPacketType.EVENT.equals(hciPacketTypeEnd))
+                if (null != hciPacketTypeEnd && !HciPacketType.EVENT.equals(hciPacketTypeEnd))
                 {
                     throw new IllegalArgumentException(String.format(
                             "Expected packet type 'EVENT' (0x04), found %s",hciPacketTypeEnd));
@@ -151,6 +150,7 @@ public class EventDecoder {
             case INQUIRY_CANCEL -> event = buildInquiryCancelComplete(data);
             case LINK_KEY_REQUEST_NEGATIVE_REPLY -> event = buildLinkKeyRequestNegativeReplyComplete(data);
             case PIN_CODE_REQUEST_REPLY -> event = buildPinCodeRequestReplyComplete(data);
+            case WRITE_LINK_SUPERVISION_TIMEOUT -> event = buildWriteLinkSupervisionTimeoutComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -657,6 +657,15 @@ public class EventDecoder {
         PinCodeRequestReplyComplete event = new PinCodeRequestReplyComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         event.setBdAddr(new BluetoothAddress(data));
+        return event;
+    }
+
+
+    private WriteLinkSupervisionTimeoutComplete buildWriteLinkSupervisionTimeoutComplete(IoCtlMessage data)
+    {
+        WriteLinkSupervisionTimeoutComplete event = new WriteLinkSupervisionTimeoutComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setHandle(data.read2octets());
         return event;
     }
 }

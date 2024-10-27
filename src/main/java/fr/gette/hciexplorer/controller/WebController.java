@@ -1,6 +1,7 @@
 package fr.gette.hciexplorer.controller;
 
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
+import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
 import fr.gette.hciexplorer.service.EventDecoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,8 @@ public class WebController
 	@ResponseBody
 	public HciMessage decodeEvent(@RequestParam("data") String data)
 	{
-		HciMessage eventMessage = eventDecoder.decode(data);
+		IoCtlMessage ioctlMessage = new IoCtlMessage(data);
+		HciMessage eventMessage = eventDecoder.decode(ioctlMessage);
 		return eventMessage;
 	}
 }
