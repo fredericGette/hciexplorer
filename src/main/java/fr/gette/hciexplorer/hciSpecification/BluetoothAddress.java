@@ -23,7 +23,7 @@ public class BluetoothAddress {
     }
 
     public String getString() {
-        String string = value.toString(16);
-        return string.replaceAll("(.{2})(?!$)", "$1:").toUpperCase();
+        String string = String.format("%012X",value);
+        return string.replaceAll("(.{2})(?!$)", "$1:");
     }
 }

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,8 +37,8 @@ public class Parser
 	private static final String IOCTL_BTHX_READ_HCI = "0x410413";
 	private static final String IOCTL_BTHX_WRITE_HCI = "0x41040F";
 	private final Pattern rawLinePattern = Pattern.compile("^((?:[^!]*!){3})([^!]*)"); // The delimiter is the third "!"
-	private final Pattern rawLineHeaderPattern = Pattern.compile("^([^ ]* [^ ]*) ([^!]*)!([^!]*)!([^!]*)!"); // MM-dd HH:mm:ss.SSS HCI!lowerDeviceObject-lowerDriverName!uniqueID!
-	private final Pattern inputPattern = Pattern.compile("^Receive IoControlCode=([^ ]*) InputBufferLength=([^ ]*) OutputBufferLength=([^ ]*)");
+	private final Pattern rawLineHeaderPattern = Pattern.compile("^([^ ]*.[^ ]*) ([^!]*)!([^!]*)!([^!]*)!"); // MM-dd HH:mm:ss.SSS HCI!lowerDeviceObject-lowerDriverName!uniqueID!
+	private final Pattern inputPattern = Pattern.compile("^Receive IoControlCode=([^ ]*) InputBufferLength=([^ ]*) OutputBufferLength=([^ ]*) StopBTHX=false");
 	private final Pattern ouputPattern = Pattern.compile("^Complete IoControlCode=([^ ]*) OutputBufferLength=([^ ]*) Status=0x([^ ]*)");
 	private final Pattern dataPattern  = Pattern.compile("^([0-9A-F]{2} )*");
 	//private final DateTimeFormatter timestampHeaderFormatter  = DateTimeFormatter.ofPattern("MM-dd HH:mm:ss.SSS");
@@ -106,8 +107,15 @@ public class Parser
 			throw new ParseException("Wrong filter ID", 0);
 		}
 
-		LocalDateTime ldt = LocalDateTime.parse(rawLineHeaderMatcher.group(1), timestampHeaderFormatter);
-		ZonedDateTime timestamp = ZonedDateTime.of(ldt, ZoneId.systemDefault());
+		String windowsFileTime = rawLineHeaderMatcher.group(1);
+		String[] fileTimeHighLow = windowsFileTime.split("\\.");
+		Long fileTime = Long.parseLong(fileTimeHighLow[0]);
+		fileTime = fileTime << 32;
+		fileTime += Long.parseLong(fileTimeHighLow[1]);
+		Long timeInMilliseconds = fileTime / (10 * 1000) - 11644473600000L;
+
+		Instant instant = Instant.ofEpochMilli(timeInMilliseconds);
+		ZonedDateTime timestamp = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
 
 		Long rawMsgId = Long.parseLong(rawLineHeaderMatcher.group(4), 16);
 

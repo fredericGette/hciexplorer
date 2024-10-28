@@ -95,6 +95,7 @@ public class EventDecoder {
             case LINK_KEY_NOTIFICATION -> event = buildLinkKeyNotification(data);
             case AUTHENTICATION_COMPLETE -> event = buildAuthenticationComplete(data);
             case ENCRYPTION_CHANGE -> event = buildEncryptionChange(data);
+            case INQUIRY_RESULT -> event = buildInquiryResult(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -666,6 +667,25 @@ public class EventDecoder {
         WriteLinkSupervisionTimeoutComplete event = new WriteLinkSupervisionTimeoutComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         event.setHandle(data.read2octets());
+        return event;
+    }
+
+    private EventInquiryResult buildInquiryResult(IoCtlMessage data)
+    {
+        EventInquiryResult event = new EventInquiryResult();
+        event.setNumResponses(data.read1octet());
+        List<EventInquiryResult.SingleInquiryResult> results = new ArrayList<>();
+        for (int i=0; i<event.getNumResponses(); i++) {
+            EventInquiryResult.SingleInquiryResult result = new EventInquiryResult.SingleInquiryResult();
+            result.setBdAddr(new BluetoothAddress(data));
+            result.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
+            data.read1octet(); // reserved. It was the Page_Scan_Period_Mode parameter in the v1.1 specification.
+            data.read1octet(); // reserved. It was the Page_Scan_Mode parameter in the v1.1 specification.
+            result.setClassOfDevice(new ClassOfDevice(data));
+            result.setClockOffset(data.read2octets());
+            results.add(result);
+        }
+        event.setInquiryResult(results);
         return event;
     }
 }
