@@ -1,7 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification;
 
 import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -101,7 +101,7 @@ public class SupportedCommands {
         // ...
     }
 
-    public SupportedCommands(IoCtlMessage data)
+    public SupportedCommands(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<64; i++)

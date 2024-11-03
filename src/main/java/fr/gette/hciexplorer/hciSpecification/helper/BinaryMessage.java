@@ -1,24 +1,22 @@
-package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
+package fr.gette.hciexplorer.hciSpecification.helper;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class IoCtlMessage {
-    short[] data;
-    int offset;
+public class BinaryMessage {
+    private final short[] data;
+    private int offset;
 
-    public IoCtlMessage(short[] data) {
+    public BinaryMessage(short[] data) {
         this.data = data;
         offset = 0;
     }
 
-    public IoCtlMessage(String data) {
+    public BinaryMessage(String data) {
         String[] strings = data.split(" ");
-        List<Short> shorts = Stream.of(strings).map(string -> Short.parseShort(string, 16)).collect(Collectors.toList());
+        List<Short> shorts = Stream.of(strings).map(string -> Short.parseShort(string, 16)).toList();
         this.data = new short[shorts.size()];
         for (int i=0; i< shorts.size(); i++) {
             this.data[i] = shorts.get(i);

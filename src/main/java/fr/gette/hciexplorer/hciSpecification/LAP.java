@@ -1,13 +1,11 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,7 +21,7 @@ public class LAP
         valueLowerAddressPart.put(0x9E8B00, LowerAddressPart.LIAC);
     }
 
-    public LAP(IoCtlMessage data)
+    public LAP(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<3; i++)

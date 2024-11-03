@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -148,7 +148,7 @@ public class ClassOfDevice {
         toyDeviceClassValue.put(MinorDeviceClass.HEALTH_DATA_DISPLAY, 7);
     }
 
-    public ClassOfDevice(IoCtlMessage data)
+    public ClassOfDevice(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<3; i++)

@@ -4,8 +4,7 @@ import fr.gette.hciexplorer.entity.BeginWriteRawMessage;
 import fr.gette.hciexplorer.entity.EndWriteRawMessage;
 import fr.gette.hciexplorer.hciSpecification.*;
 import fr.gette.hciexplorer.hciSpecification.command.*;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CommandDecoder {
 
-    public HciMessage decode(IoCtlMessage beginData)
+    public HciMessage decode(BinaryMessage beginData)
     {
         beginData.resetOffset();
         return decode(beginData, IoCtlStatus.STATUS_SUCCESS);
@@ -24,15 +23,15 @@ public class CommandDecoder {
     public HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end) {
         HciMessage hciMsg;
 
-        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        BinaryMessage beginData = new BinaryMessage(begin.getInputBuffer());
 
-        IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
+        BinaryMessage endData = new BinaryMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
         return decode(beginData, ioCtlStatus);
     }
 
-    private HciMessage decode(IoCtlMessage beginData, IoCtlStatus ioCtlStatus) {
+    private HciMessage decode(BinaryMessage beginData, IoCtlStatus ioCtlStatus) {
         HciMessage hciMsg;
 
         beginData.read4octets(); // remove the data length
@@ -70,7 +69,7 @@ public class CommandDecoder {
         return hciMsg;
     }
 
-    private Command build(CommandCode opCode, IoCtlMessage data)
+    private Command build(CommandCode opCode, BinaryMessage data)
     {
         Command command;
         switch(opCode)
@@ -135,115 +134,115 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildReadLocalOobData(IoCtlMessage data) {
+    private Command buildReadLocalOobData(BinaryMessage data) {
         return new ReadLocalOobData();
     }
 
-    private Command buildWriteSimplePairingMode(IoCtlMessage data) {
+    private Command buildWriteSimplePairingMode(BinaryMessage data) {
         WriteSimplePairingMode command = new WriteSimplePairingMode();
         command.setSimplePairingMode(SimplePairingMode.get(data.read1octet()));
         return command;
     }
 
-    private Command buildReadLocalSupportedFeature(IoCtlMessage data) {
+    private Command buildReadLocalSupportedFeature(BinaryMessage data) {
         return new ReadLocalSupportedFeature();
     }
 
-    private Command buildReadLocalVersionInformation(IoCtlMessage data) {
+    private Command buildReadLocalVersionInformation(BinaryMessage data) {
         return new ReadLocalVersionInformation();
     }
 
-    private Command buildReadBufferSize(IoCtlMessage data) {
+    private Command buildReadBufferSize(BinaryMessage data) {
         return new ReadBufferSize();
     }
 
-    private Command buildReadLocalSupportedCommands(IoCtlMessage data) {
+    private Command buildReadLocalSupportedCommands(BinaryMessage data) {
         return new ReadLocalSupportedCommands();
     }
 
-    private Command buildReadBdAddr(IoCtlMessage data) {
+    private Command buildReadBdAddr(BinaryMessage data) {
         return new ReadBdAddr();
     }
 
-    private Command buildReset(IoCtlMessage data) {
+    private Command buildReset(BinaryMessage data) {
         return new Reset();
     }
 
-    private Command buildWriteClassOfDevice(IoCtlMessage data) {
+    private Command buildWriteClassOfDevice(BinaryMessage data) {
         WriteClassOfDevice command = new WriteClassOfDevice();
         command.setClassOfDevice(new ClassOfDevice(data));
         return command;
     }
 
-    private Command buildWriteSimplePairingDebugMode(IoCtlMessage data) {
+    private Command buildWriteSimplePairingDebugMode(BinaryMessage data) {
         WriteSimplePairingDebugMode command = new WriteSimplePairingDebugMode();
         command.setSimplePairingMode(SimplePairingMode.get(data.read1octet()));
         return command;
     }
 
-    private Command buildWriteAuthenticationEnable(IoCtlMessage data) {
+    private Command buildWriteAuthenticationEnable(BinaryMessage data) {
         WriteAuthenticationEnable command = new WriteAuthenticationEnable();
         command.setAuthenticationEnable(AuthenticationEnable.get(data.read1octet()));
         return command;
     }
 
-    private Command buildSetEventMask(IoCtlMessage data) {
+    private Command buildSetEventMask(BinaryMessage data) {
         SetEventMask command = new SetEventMask();
         command.setEventMask(new EventMask(data));
         return command;
     }
 
-    private Command buildReadInquiryResponseTransmitPowerLevel(IoCtlMessage data) {
+    private Command buildReadInquiryResponseTransmitPowerLevel(BinaryMessage data) {
         ReadInquiryResponseTransmitPowerLevel command = new ReadInquiryResponseTransmitPowerLevel();
         return command;
     }
 
-    private Command buildWritePageTimeout(IoCtlMessage data) {
+    private Command buildWritePageTimeout(BinaryMessage data) {
         WritePageTimeout command = new WritePageTimeout();
         command.setPageTimeout(data.read2octets());
         return command;
     }
 
-    private Command buildWritePageScanActivity(IoCtlMessage data) {
+    private Command buildWritePageScanActivity(BinaryMessage data) {
         WritePageScanActivity command = new WritePageScanActivity();
         command.setPageScanInterval(data.read2octets());
         command.setPageScanWindow(data.read2octets());
         return command;
     }
 
-    private Command buildWritePageScanType(IoCtlMessage data) {
+    private Command buildWritePageScanType(BinaryMessage data) {
         WritePageScanType command = new WritePageScanType();
         command.setPageScanType(PageScanType.get(data.read1octet()));
         return command;
     }
 
-    private Command buildWriteInquiryScanActivity(IoCtlMessage data) {
+    private Command buildWriteInquiryScanActivity(BinaryMessage data) {
         WriteInquiryScanActivity command = new WriteInquiryScanActivity();
         command.setInquiryScanInterval(data.read2octets());
         command.setInquiryScanWindow(data.read2octets());
         return command;
     }
 
-    private Command buildWriteInquiryScanType(IoCtlMessage data) {
+    private Command buildWriteInquiryScanType(BinaryMessage data) {
         WriteInquiryScanType command = new WriteInquiryScanType();
         command.setScanType(InquiryScanType.get(data.read1octet()));
         return command;
     }
 
-    private Command buildWriteInquiryMode(IoCtlMessage data) {
+    private Command buildWriteInquiryMode(BinaryMessage data) {
         WriteInquiryMode command = new WriteInquiryMode();
         command.setInquiryMode(InquiryMode.get(data.read1octet()));
         return command;
     }
 
-    private Command buildWriteExtendedInquiryResponse(IoCtlMessage data) {
+    private Command buildWriteExtendedInquiryResponse(BinaryMessage data) {
         WriteExtendedInquiryResponse command = new WriteExtendedInquiryResponse();
         command.setFecRequired(FecRequired.get(data.read1octet()));
         command.setExtendedInquiryResponse(new ExtendedInquiryResponse(data));
         return command;
     }
 
-    private Command buildHostBufferSize(IoCtlMessage data) {
+    private Command buildHostBufferSize(BinaryMessage data) {
         HostBufferSize command = new HostBufferSize();
         command.setHostACLDataPacketLength(data.read2octets());
         command.setHostSynchronousDataPacketLength(data.read1octet());
@@ -252,57 +251,57 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildWriteLocalName(IoCtlMessage data) {
+    private Command buildWriteLocalName(BinaryMessage data) {
         WriteLocalName command = new WriteLocalName();
         command.setLocalName(data.readNullTerminatedString(248));
         return command;
     }
 
-    private Command buildLeReadLocalSupportedFeatures(IoCtlMessage data) {
+    private Command buildLeReadLocalSupportedFeatures(BinaryMessage data) {
         LeReadLocalSupportedFeatures command = new LeReadLocalSupportedFeatures();
         return command;
     }
 
-    private Command buildLeReadSupportedStates(IoCtlMessage data) {
+    private Command buildLeReadSupportedStates(BinaryMessage data) {
         LeReadSupportedStates command = new LeReadSupportedStates();
         return command;
     }
 
-    private Command buildLeReadBufferSizeV1(IoCtlMessage data) {
+    private Command buildLeReadBufferSizeV1(BinaryMessage data) {
         LeReadBufferSizeV1 command = new LeReadBufferSizeV1();
         return command;
     }
 
-    private Command buildLeReadConnectListSize(IoCtlMessage data) {
+    private Command buildLeReadConnectListSize(BinaryMessage data) {
         LeReadConnectListSize command = new LeReadConnectListSize();
         return command;
     }
 
-    private Command buildWriteLeHostSupport(IoCtlMessage data) {
+    private Command buildWriteLeHostSupport(BinaryMessage data) {
         WriteLeHostSupport command = new WriteLeHostSupport();
         command.setLeSupportedHost(LeSupportedHost.get(data.read1octet()));
         command.setSimultaneousLeHost(SimultaneousLeHost.get(data.read1octet()));
         return command;
     }
 
-    private Command buildLeReadAdvertisingPhysicalChannelTxPower(IoCtlMessage data) {
+    private Command buildLeReadAdvertisingPhysicalChannelTxPower(BinaryMessage data) {
         LeReadAdvertisingPhysicalChannelTxPower command = new LeReadAdvertisingPhysicalChannelTxPower();
         return command;
     }
 
-    private Command buildLeSetEventMask(IoCtlMessage data) {
+    private Command buildLeSetEventMask(BinaryMessage data) {
         LeSetEventMask command = new LeSetEventMask();
         command.setLeEventMask(new LeEventMask(data));
         return command;
     }
 
-    private Command buildWriteScanEnable(IoCtlMessage data) {
+    private Command buildWriteScanEnable(BinaryMessage data) {
         WriteScanEnable command = new WriteScanEnable();
         command.setScanEnable(new ScanEnable(data));
         return command;
     }
 
-    private Command buildCreateConnection(IoCtlMessage data) {
+    private Command buildCreateConnection(BinaryMessage data) {
         CreateConnection command = new CreateConnection();
         command.setBdAddr(new BluetoothAddress(data));
         command.setPacketType(new PacketTypeUsable(data));
@@ -313,13 +312,13 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildWriteInquiryTransmitPowerLevel(IoCtlMessage data) {
+    private Command buildWriteInquiryTransmitPowerLevel(BinaryMessage data) {
         WriteInquiryTransmitPowerLevel command = new WriteInquiryTransmitPowerLevel();
         command.setTxPower(data.read1signedOctet());
         return command;
     }
 
-    private Command buildInquiry(IoCtlMessage data) {
+    private Command buildInquiry(BinaryMessage data) {
         Inquiry command = new Inquiry();
         command.setLap(new LAP(data));
         command.setInquiryLength(data.read1octet());
@@ -327,7 +326,7 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildRemoteNameRequest(IoCtlMessage data) {
+    private Command buildRemoteNameRequest(BinaryMessage data) {
         RemoteNameRequest command = new RemoteNameRequest();
         command.setBdAddr(new BluetoothAddress(data));
         command.setPageScanRepetitionMode(PageScanRepetitionMode.get(data.read1octet()));
@@ -336,94 +335,94 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildReadRemoteSupportedFeatures(IoCtlMessage data) {
+    private Command buildReadRemoteSupportedFeatures(BinaryMessage data) {
         ReadRemoteSupportedFeatures command = new ReadRemoteSupportedFeatures();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildReadRssi(IoCtlMessage data) {
+    private Command buildReadRssi(BinaryMessage data) {
         ReadRssi command = new ReadRssi();
         command.setHandle(data.read2octets());
         return command;
     }
 
-    private Command buildRoleDiscovery(IoCtlMessage data) {
+    private Command buildRoleDiscovery(BinaryMessage data) {
         RoleDiscovery command = new RoleDiscovery();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildWriteAutomaticFlushTimeout(IoCtlMessage data) {
+    private Command buildWriteAutomaticFlushTimeout(BinaryMessage data) {
         WriteAutomaticFlushTimeout command = new WriteAutomaticFlushTimeout();
         command.setConnectionHandle(data.read2octets());
         command.setFlushTimeout(data.read2octets());
         return command;
     }
 
-    private Command buildReadRemoteVersionInformation(IoCtlMessage data) {
+    private Command buildReadRemoteVersionInformation(BinaryMessage data) {
         ReadRemoteVersionInformation command = new ReadRemoteVersionInformation();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildReadClockOffset(IoCtlMessage data) {
+    private Command buildReadClockOffset(BinaryMessage data) {
         ReadClockOffset command = new ReadClockOffset();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildReadTransmitPowerLevel(IoCtlMessage data) {
+    private Command buildReadTransmitPowerLevel(BinaryMessage data) {
         ReadTransmitPowerLevel command = new ReadTransmitPowerLevel();
         command.setConnectionHandle(data.read2octets());
         command.setTransmitPowerLevelType(TransmitPowerLevelType.get(data.read1octet()));
         return command;
     }
 
-    private Command buildReadLinkQuality(IoCtlMessage data) {
+    private Command buildReadLinkQuality(BinaryMessage data) {
         ReadLinkQuality command = new ReadLinkQuality();
         command.setHandle(data.read2octets());
         return command;
     }
 
-    private Command buildReadLinkSupervisionTimeout(IoCtlMessage data) {
+    private Command buildReadLinkSupervisionTimeout(BinaryMessage data) {
         ReadLinkSupervisionTimeout command = new ReadLinkSupervisionTimeout();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildWriteLinkPolicySettings(IoCtlMessage data) {
+    private Command buildWriteLinkPolicySettings(BinaryMessage data) {
         WriteLinkPolicySettings command = new WriteLinkPolicySettings();
         command.setConnectionHandle(data.read2octets());
         command.setLinkPolicySettings(new LinkPolicySettings(data));
         return command;
     }
 
-    private Command buildDisconnect(IoCtlMessage data) {
+    private Command buildDisconnect(BinaryMessage data) {
         Disconnect command = new Disconnect();
         command.setConnectionHandle(data.read2octets());
         command.setReason(ErrorCode.get(data.read1octet()));
         return command;
     }
 
-    private Command buildInquiryCancel(IoCtlMessage data) {
+    private Command buildInquiryCancel(BinaryMessage data) {
         InquiryCancel command = new InquiryCancel();
         return command;
     }
 
-    private Command buildAuthenticationRequested(IoCtlMessage data) {
+    private Command buildAuthenticationRequested(BinaryMessage data) {
         AuthenticationRequested command = new AuthenticationRequested();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildLinkKeyRequestNegativeReply(IoCtlMessage data) {
+    private Command buildLinkKeyRequestNegativeReply(BinaryMessage data) {
         LinkKeyRequestNegativeReply command = new LinkKeyRequestNegativeReply();
         command.setBdAddr(new BluetoothAddress(data));
         return command;
     }
 
-    private Command buildPinCodeRequestReply(IoCtlMessage data) {
+    private Command buildPinCodeRequestReply(BinaryMessage data) {
         PinCodeRequestReply command = new PinCodeRequestReply();
         command.setBdAddr(new BluetoothAddress(data));
         command.setPinCodeLength(data.read1octet());
@@ -431,7 +430,7 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildSetConnectionEncryption(IoCtlMessage data) {
+    private Command buildSetConnectionEncryption(BinaryMessage data) {
         SetConnectionEncryption command = new SetConnectionEncryption();
         command.setConnectionHandle(data.read2octets());
         command.setEncryptionEnable(EncryptionEnabled.get(data.read1octet()));
@@ -439,20 +438,20 @@ public class CommandDecoder {
     }
 
 
-    private Command buildExitSniffMode(IoCtlMessage data) {
+    private Command buildExitSniffMode(BinaryMessage data) {
         ExitSniffMode command = new ExitSniffMode();
         command.setConnectionHandle(data.read2octets());
         return command;
     }
 
-    private Command buildWriteLinkSupervisionTimeout(IoCtlMessage data) {
+    private Command buildWriteLinkSupervisionTimeout(BinaryMessage data) {
         WriteLinkSupervisionTimeout command = new WriteLinkSupervisionTimeout();
         command.setConnectionHandle(data.read2octets());
         command.setLinkSupervisionTimeout(data.read2octets());
         return command;
     }
 
-    private Command buildPeriodicInquiryMode(IoCtlMessage data) {
+    private Command buildPeriodicInquiryMode(BinaryMessage data) {
         PeriodicInquiryMode command = new PeriodicInquiryMode();
         command.setMaxPeriodLength(data.read2octets());
         command.setMinPeriodLength(data.read2octets());
@@ -462,7 +461,7 @@ public class CommandDecoder {
         return command;
     }
 
-    private Command buildExitPeriodicInquiryMode(IoCtlMessage data) {
+    private Command buildExitPeriodicInquiryMode(BinaryMessage data) {
         ExitPeriodicInquiryMode command = new ExitPeriodicInquiryMode();
         return command;
     }

@@ -5,8 +5,8 @@ import fr.gette.hciexplorer.hciSpecification.*;
 import fr.gette.hciexplorer.hciSpecification.data.AclData;
 import fr.gette.hciexplorer.hciSpecification.data.AclDataCanceled;
 import fr.gette.hciexplorer.hciSpecification.data.AclDataUnfinished;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,15 @@ import java.math.BigInteger;
 @Slf4j
 public class DataDecoder {
 
-    public HciMessage decodeRead(IoCtlMessage endData)
+    private final L2capDecoder l2capDecoder;
+
+    public HciMessage decodeRead(BinaryMessage endData)
     {
         endData.resetOffset();
         return decodeRead(endData, IoCtlStatus.STATUS_SUCCESS);
     }
 
-    public HciMessage decodeWrite(IoCtlMessage beginData)
+    public HciMessage decodeWrite(BinaryMessage beginData)
     {
         beginData.resetOffset();
         return decodeWrite(beginData, IoCtlStatus.STATUS_SUCCESS);
@@ -33,13 +35,13 @@ public class DataDecoder {
     public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end) {
         HciMessage hciMsg;
 
-        IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
+        BinaryMessage endData = new BinaryMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
         return decodeRead(endData, ioCtlStatus);
     }
 
-    private HciMessage decodeRead(IoCtlMessage endData, IoCtlStatus ioCtlStatus) {
+    private HciMessage decodeRead(BinaryMessage endData, IoCtlStatus ioCtlStatus) {
         HciMessage hciMsg;
 
         switch (ioCtlStatus)
@@ -77,13 +79,13 @@ public class DataDecoder {
     HciMessage decode(BeginWriteRawMessage begin, EndWriteRawMessage end) {
         HciMessage hciMsg;
 
-        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        BinaryMessage beginData = new BinaryMessage(begin.getInputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
         return decodeWrite(beginData, ioCtlStatus);
     }
 
-    private HciMessage decodeWrite(IoCtlMessage beginData, IoCtlStatus ioCtlStatus) {
+    private HciMessage decodeWrite(BinaryMessage beginData, IoCtlStatus ioCtlStatus) {
         HciMessage hciMsg;
         switch (ioCtlStatus)
         {
@@ -117,7 +119,7 @@ public class DataDecoder {
         return hciMsg;
     }
 
-    private AclData decode(IoCtlMessage data, AclDirection direction)
+    private AclData decode(BinaryMessage data, AclDirection direction)
     {
         AclData aclData = new AclData();
         aclData.setDirection(direction);
@@ -133,6 +135,10 @@ public class DataDecoder {
         aclData.setBroadcastFlag(bcFlag.shortValue());
         aclData.setDataTotalLength(dataTotalLength.intValue());
         aclData.setData(data.readRemaining());
+
+        BinaryMessage l2capData = new BinaryMessage(aclData.getData());
+        Frame l2capPacket = l2capDecoder.decode(l2capData);
+        aclData.setL2capPacket(l2capPacket);
 
         return aclData;
     }

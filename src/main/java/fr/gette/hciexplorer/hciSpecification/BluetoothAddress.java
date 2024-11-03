@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ public class BluetoothAddress {
 
     BigInteger value;
 
-    public BluetoothAddress(IoCtlMessage data)
+    public BluetoothAddress(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<6; i++)

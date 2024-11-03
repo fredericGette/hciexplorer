@@ -1,8 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification.command;
 
-import fr.gette.hciexplorer.hciSpecification.HciMessage;
-import fr.gette.hciexplorer.hciSpecification.HciPacketType;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
+import fr.gette.hciexplorer.service.IoCtlStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

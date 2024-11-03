@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +24,7 @@ public class LinkPolicySettings {
         linkPolicyBit.put(LinkPolicy.PARK_STATE, 0*8+3);
     }
 
-    public LinkPolicySettings(IoCtlMessage data)
+    public LinkPolicySettings(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<2; i++)

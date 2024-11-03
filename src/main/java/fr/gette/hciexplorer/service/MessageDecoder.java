@@ -4,7 +4,7 @@ import fr.gette.hciexplorer.entity.*;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
 import fr.gette.hciexplorer.hciSpecification.UnknownWriteMessage;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import fr.gette.hciexplorer.repository.BeginReadRawMessageRepository;
 import fr.gette.hciexplorer.repository.BeginWriteRawMessageRepository;
 import fr.gette.hciexplorer.repository.EndReadRawMessageRepository;
@@ -49,7 +49,7 @@ class MessageDecoder {
     {
         HciMessage hciMsg;
 
-        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        BinaryMessage beginData = new BinaryMessage(begin.getInputBuffer());
         // The message contains only one information: the type of the HCI packet.
         HciPacketType hciPacketTypeBegin = HciPacketType.get(beginData.read4octets());
 
@@ -72,7 +72,7 @@ class MessageDecoder {
     {
         HciMessage hciMsg;
 
-        IoCtlMessage beginData = new IoCtlMessage(begin.getInputBuffer());
+        BinaryMessage beginData = new BinaryMessage(begin.getInputBuffer());
         long dataLength = beginData.read4octets();
         short type = beginData.read1octet();
         HciPacketType hciPacketType = HciPacketType.get(type);

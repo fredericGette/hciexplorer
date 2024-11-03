@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class SupportedLeFeatures
         featureBit.put(LeFeature.LE_ENCRYPTION, 0*8+0);
     }
 
-    public SupportedLeFeatures(IoCtlMessage data)
+    public SupportedLeFeatures(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<8; i++)

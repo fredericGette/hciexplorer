@@ -7,8 +7,7 @@ import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.*;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlStatus;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ import java.util.List;
 @Slf4j
 public class EventDecoder {
 
-    public HciMessage decode(IoCtlMessage endData)
+    public HciMessage decode(BinaryMessage endData)
     {
         endData.resetOffset();
         return decode(endData, IoCtlStatus.STATUS_SUCCESS);
@@ -29,13 +28,13 @@ public class EventDecoder {
 
     public HciMessage decode(BeginReadRawMessage begin, EndReadRawMessage end)
     {
-        IoCtlMessage endData = new IoCtlMessage(end.getOutputBuffer());
+        BinaryMessage endData = new BinaryMessage(end.getOutputBuffer());
         IoCtlStatus ioCtlStatus = IoCtlStatus.get(end.getStatus());
 
         return decode(endData, ioCtlStatus);
     }
 
-    private HciMessage decode(IoCtlMessage endData, IoCtlStatus ioCtlStatus) {
+    private HciMessage decode(BinaryMessage endData, IoCtlStatus ioCtlStatus) {
         HciMessage hciMsg;
 
         switch (ioCtlStatus)
@@ -71,7 +70,7 @@ public class EventDecoder {
         return hciMsg;
     }
 
-    private Event build(EventCode eventCode, IoCtlMessage data)
+    private Event build(EventCode eventCode, BinaryMessage data)
     {
         Event event;
 
@@ -103,7 +102,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventCommandComplete buildCommandComplete(IoCtlMessage data)
+    private EventCommandComplete buildCommandComplete(BinaryMessage data)
     {
         EventCommandComplete event;
         short numHciCommandPackets = data.read1octet();
@@ -161,7 +160,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventCommandStatus buildCommandStatus(IoCtlMessage data)
+    private EventCommandStatus buildCommandStatus(BinaryMessage data)
     {
         EventCommandStatus event = new EventCommandStatus();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -170,7 +169,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventConnectionComplete buildConnectionComplete(IoCtlMessage data)
+    private EventConnectionComplete buildConnectionComplete(BinaryMessage data)
     {
         EventConnectionComplete event = new EventConnectionComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -181,7 +180,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventExtendedInquiryResult buildExtendedInquiryResult(IoCtlMessage data)
+    private EventExtendedInquiryResult buildExtendedInquiryResult(BinaryMessage data)
     {
         EventExtendedInquiryResult event = new EventExtendedInquiryResult();
         event.setNumResponses(data.read1octet());
@@ -195,7 +194,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventInquiryResultWithRssi buildInquiryResultWithRssi(IoCtlMessage data)
+    private EventInquiryResultWithRssi buildInquiryResultWithRssi(BinaryMessage data)
     {
         EventInquiryResultWithRssi event = new EventInquiryResultWithRssi();
         event.setNumResponses(data.read1octet());
@@ -214,14 +213,14 @@ public class EventDecoder {
         return event;
     }
 
-    private EventInquiryComplete buildInquiryComplete(IoCtlMessage data)
+    private EventInquiryComplete buildInquiryComplete(BinaryMessage data)
     {
         EventInquiryComplete event = new EventInquiryComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private EventRemoteNameRequestComplete buildRemoteNameRequestComplete(IoCtlMessage data)
+    private EventRemoteNameRequestComplete buildRemoteNameRequestComplete(BinaryMessage data)
     {
         EventRemoteNameRequestComplete event = new EventRemoteNameRequestComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -230,7 +229,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventReadRemoteSupportedFeaturesComplete buildReadRemoteSupportedFeaturesComplete(IoCtlMessage data)
+    private EventReadRemoteSupportedFeaturesComplete buildReadRemoteSupportedFeaturesComplete(BinaryMessage data)
     {
         EventReadRemoteSupportedFeaturesComplete event = new EventReadRemoteSupportedFeaturesComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -239,7 +238,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventNumberOfCompletedPackets buildNumberOfCompletedPackets(IoCtlMessage data)
+    private EventNumberOfCompletedPackets buildNumberOfCompletedPackets(BinaryMessage data)
     {
         EventNumberOfCompletedPackets event = new EventNumberOfCompletedPackets();
         event.setNumberOfHandles(data.read1octet());
@@ -258,7 +257,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventReadRemoteVersionInformationComplete buildReadRemoteVersionInformationComplete(IoCtlMessage data)
+    private EventReadRemoteVersionInformationComplete buildReadRemoteVersionInformationComplete(BinaryMessage data)
     {
         EventReadRemoteVersionInformationComplete event = new EventReadRemoteVersionInformationComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -269,7 +268,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventReadClockOffsetComplete buildReadClockOffsetComplete(IoCtlMessage data)
+    private EventReadClockOffsetComplete buildReadClockOffsetComplete(BinaryMessage data)
     {
         EventReadClockOffsetComplete event = new EventReadClockOffsetComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -278,7 +277,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventQosSetupComplete buildQosSetupComplete(IoCtlMessage data)
+    private EventQosSetupComplete buildQosSetupComplete(BinaryMessage data)
     {
         EventQosSetupComplete event = new EventQosSetupComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -292,7 +291,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventDisconnectionComplete buildDisconnectionComplete(IoCtlMessage data)
+    private EventDisconnectionComplete buildDisconnectionComplete(BinaryMessage data)
     {
         EventDisconnectionComplete event = new EventDisconnectionComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -301,21 +300,21 @@ public class EventDecoder {
         return event;
     }
 
-    private EventLinkKeyRequest buildLinkKeyRequest(IoCtlMessage data)
+    private EventLinkKeyRequest buildLinkKeyRequest(BinaryMessage data)
     {
         EventLinkKeyRequest event = new EventLinkKeyRequest();
         event.setBdAddr(new BluetoothAddress(data));
         return event;
     }
 
-    private EventPinCodeRequest buildPinCodeRequest(IoCtlMessage data)
+    private EventPinCodeRequest buildPinCodeRequest(BinaryMessage data)
     {
         EventPinCodeRequest event = new EventPinCodeRequest();
         event.setBdAddr(new BluetoothAddress(data));
         return event;
     }
 
-    private EventLinkKeyNotification buildLinkKeyNotification(IoCtlMessage data)
+    private EventLinkKeyNotification buildLinkKeyNotification(BinaryMessage data)
     {
         EventLinkKeyNotification event = new EventLinkKeyNotification();
         event.setBdAddr(new BluetoothAddress(data));
@@ -324,7 +323,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventAuthenticationComplete buildAuthenticationComplete(IoCtlMessage data)
+    private EventAuthenticationComplete buildAuthenticationComplete(BinaryMessage data)
     {
         EventAuthenticationComplete event = new EventAuthenticationComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -332,7 +331,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventEncryptionChange buildEncryptionChange(IoCtlMessage data)
+    private EventEncryptionChange buildEncryptionChange(BinaryMessage data)
     {
         EventEncryptionChange event = new EventEncryptionChange();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -341,21 +340,21 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(IoCtlMessage data)
+    private WriteClassOfDeviceComplete buildWriteClassOfDeviceComplete(BinaryMessage data)
     {
         WriteClassOfDeviceComplete event = new WriteClassOfDeviceComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ResetComplete buildResetComplete(IoCtlMessage data)
+    private ResetComplete buildResetComplete(BinaryMessage data)
     {
         ResetComplete event = new ResetComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ReadBdAddrComplete buildReadBdAddrComplete(IoCtlMessage data)
+    private ReadBdAddrComplete buildReadBdAddrComplete(BinaryMessage data)
     {
         ReadBdAddrComplete event = new ReadBdAddrComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -363,7 +362,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadLocalSupportedCommandsComplete buildReadLocalSupportedCommandsComplete(IoCtlMessage data)
+    private ReadLocalSupportedCommandsComplete buildReadLocalSupportedCommandsComplete(BinaryMessage data)
     {
         ReadLocalSupportedCommandsComplete event = new ReadLocalSupportedCommandsComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -371,7 +370,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadBufferSizeComplete buildReadBufferSizeComplete(IoCtlMessage data)
+    private ReadBufferSizeComplete buildReadBufferSizeComplete(BinaryMessage data)
     {
         ReadBufferSizeComplete event = new ReadBufferSizeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -382,7 +381,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadLocalVersionInformationComplete buildReadLocalVersionInformationComplete(IoCtlMessage data)
+    private ReadLocalVersionInformationComplete buildReadLocalVersionInformationComplete(BinaryMessage data)
     {
         ReadLocalVersionInformationComplete event = new ReadLocalVersionInformationComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -394,7 +393,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadLocalSupportedFeatureComplete buildReadLocalSupportedFeatureComplete(IoCtlMessage data)
+    private ReadLocalSupportedFeatureComplete buildReadLocalSupportedFeatureComplete(BinaryMessage data)
     {
         ReadLocalSupportedFeatureComplete event = new ReadLocalSupportedFeatureComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -402,14 +401,14 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteSimplePairingModeComplete buildWriteSimplePairingModeComplete(IoCtlMessage data)
+    private WriteSimplePairingModeComplete buildWriteSimplePairingModeComplete(BinaryMessage data)
     {
         WriteSimplePairingModeComplete event = new WriteSimplePairingModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ReadLocalOobDataComplete buildReadLocalOobDataComplete(IoCtlMessage data)
+    private ReadLocalOobDataComplete buildReadLocalOobDataComplete(BinaryMessage data)
     {
         ReadLocalOobDataComplete event = new ReadLocalOobDataComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -418,28 +417,28 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteSimplePairingDebugModeComplete buildWriteSimplePairingDebugModeComplete(IoCtlMessage data)
+    private WriteSimplePairingDebugModeComplete buildWriteSimplePairingDebugModeComplete(BinaryMessage data)
     {
         WriteSimplePairingDebugModeComplete event = new WriteSimplePairingDebugModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteAuthenticationEnableComplete buildWriteAuthenticationEnableComplete(IoCtlMessage data)
+    private WriteAuthenticationEnableComplete buildWriteAuthenticationEnableComplete(BinaryMessage data)
     {
         WriteAuthenticationEnableComplete event = new WriteAuthenticationEnableComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private SetEventMaskComplete buildSetEventMaskComplete(IoCtlMessage data)
+    private SetEventMaskComplete buildSetEventMaskComplete(BinaryMessage data)
     {
         SetEventMaskComplete event = new SetEventMaskComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ReadInquiryResponseTransmitPowerLevelComplete buildReadInquiryResponseTransmitPowerLevelComplete(IoCtlMessage data)
+    private ReadInquiryResponseTransmitPowerLevelComplete buildReadInquiryResponseTransmitPowerLevelComplete(BinaryMessage data)
     {
         ReadInquiryResponseTransmitPowerLevelComplete event = new ReadInquiryResponseTransmitPowerLevelComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -447,70 +446,70 @@ public class EventDecoder {
         return event;
     }
 
-    private WritePageTimeoutComplete buildWritePageTimeoutComplete(IoCtlMessage data)
+    private WritePageTimeoutComplete buildWritePageTimeoutComplete(BinaryMessage data)
     {
         WritePageTimeoutComplete event = new WritePageTimeoutComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WritePageScanActivityComplete buildWritePageScanActivityComplete(IoCtlMessage data)
+    private WritePageScanActivityComplete buildWritePageScanActivityComplete(BinaryMessage data)
     {
         WritePageScanActivityComplete event = new WritePageScanActivityComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WritePageScanTypeComplete buildWritePageScanTypeComplete(IoCtlMessage data)
+    private WritePageScanTypeComplete buildWritePageScanTypeComplete(BinaryMessage data)
     {
         WritePageScanTypeComplete event = new WritePageScanTypeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteInquiryScanActivityComplete buildWriteInquiryScanActivityComplete(IoCtlMessage data)
+    private WriteInquiryScanActivityComplete buildWriteInquiryScanActivityComplete(BinaryMessage data)
     {
         WriteInquiryScanActivityComplete event = new WriteInquiryScanActivityComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteInquiryScanTypeComplete buildWriteInquiryScanTypeComplete(IoCtlMessage data)
+    private WriteInquiryScanTypeComplete buildWriteInquiryScanTypeComplete(BinaryMessage data)
     {
         WriteInquiryScanTypeComplete event = new WriteInquiryScanTypeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteInquiryModeComplete buildWriteInquiryModeComplete(IoCtlMessage data)
+    private WriteInquiryModeComplete buildWriteInquiryModeComplete(BinaryMessage data)
     {
         WriteInquiryModeComplete event = new WriteInquiryModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteExtendedInquiryResponseComplete buildWriteExtendedInquiryResponseComplete(IoCtlMessage data)
+    private WriteExtendedInquiryResponseComplete buildWriteExtendedInquiryResponseComplete(BinaryMessage data)
     {
         WriteExtendedInquiryResponseComplete event = new WriteExtendedInquiryResponseComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private HostBufferSizeComplete buildHostBufferSizeComplete(IoCtlMessage data)
+    private HostBufferSizeComplete buildHostBufferSizeComplete(BinaryMessage data)
     {
         HostBufferSizeComplete event = new HostBufferSizeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteLocalNameComplete buildWriteLocalNameComplete(IoCtlMessage data)
+    private WriteLocalNameComplete buildWriteLocalNameComplete(BinaryMessage data)
     {
         WriteLocalNameComplete event = new WriteLocalNameComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private LeReadLocalSupportedFeaturesComplete buildLeReadLocalSupportedFeaturesComplete(IoCtlMessage data)
+    private LeReadLocalSupportedFeaturesComplete buildLeReadLocalSupportedFeaturesComplete(BinaryMessage data)
     {
         LeReadLocalSupportedFeaturesComplete event = new LeReadLocalSupportedFeaturesComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -518,7 +517,7 @@ public class EventDecoder {
         return event;
     }
 
-    private LeReadSupportedStatesComplete buildLeReadSupportedStatesComplete(IoCtlMessage data)
+    private LeReadSupportedStatesComplete buildLeReadSupportedStatesComplete(BinaryMessage data)
     {
         LeReadSupportedStatesComplete event = new LeReadSupportedStatesComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -526,7 +525,7 @@ public class EventDecoder {
         return event;
     }
 
-    private LeReadBufferSizeV1Complete buildLeReadBufferSizeV1Complete(IoCtlMessage data)
+    private LeReadBufferSizeV1Complete buildLeReadBufferSizeV1Complete(BinaryMessage data)
     {
         LeReadBufferSizeV1Complete event = new LeReadBufferSizeV1Complete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -535,7 +534,7 @@ public class EventDecoder {
         return event;
     }
 
-    private LeReadConnectListSizeComplete buildLeReadConnectListSizeComplete(IoCtlMessage data)
+    private LeReadConnectListSizeComplete buildLeReadConnectListSizeComplete(BinaryMessage data)
     {
         LeReadConnectListSizeComplete event = new LeReadConnectListSizeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -543,14 +542,14 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteLeHostSupportComplete buildWriteLeHostSupportComplete(IoCtlMessage data)
+    private WriteLeHostSupportComplete buildWriteLeHostSupportComplete(BinaryMessage data)
     {
         WriteLeHostSupportComplete event = new WriteLeHostSupportComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private LeReadAdvertisingPhysicalChannelTxPowerComplete buildLeReadAdvertisingPhysicalChannelTxPowerComplete(IoCtlMessage data)
+    private LeReadAdvertisingPhysicalChannelTxPowerComplete buildLeReadAdvertisingPhysicalChannelTxPowerComplete(BinaryMessage data)
     {
         LeReadAdvertisingPhysicalChannelTxPowerComplete event = new LeReadAdvertisingPhysicalChannelTxPowerComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -558,28 +557,28 @@ public class EventDecoder {
         return event;
     }
 
-    private LeSetEventMaskComplete buildLeSetEventMaskComplete(IoCtlMessage data)
+    private LeSetEventMaskComplete buildLeSetEventMaskComplete(BinaryMessage data)
     {
         LeSetEventMaskComplete event = new LeSetEventMaskComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteScanEnableComplete buildWriteScanEnableComplete(IoCtlMessage data)
+    private WriteScanEnableComplete buildWriteScanEnableComplete(BinaryMessage data)
     {
         WriteScanEnableComplete event = new WriteScanEnableComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private WriteInquiryTransmitPowerLevelComplete buildWriteInquiryTransmitPowerLevelComplete(IoCtlMessage data)
+    private WriteInquiryTransmitPowerLevelComplete buildWriteInquiryTransmitPowerLevelComplete(BinaryMessage data)
     {
         WriteInquiryTransmitPowerLevelComplete event = new WriteInquiryTransmitPowerLevelComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ReadRssiComplete buildReadRssiComplete(IoCtlMessage data)
+    private ReadRssiComplete buildReadRssiComplete(BinaryMessage data)
     {
         ReadRssiComplete event = new ReadRssiComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -588,7 +587,7 @@ public class EventDecoder {
         return event;
     }
 
-    private RoleDiscoveryComplete buildRoleDiscoveryComplete(IoCtlMessage data)
+    private RoleDiscoveryComplete buildRoleDiscoveryComplete(BinaryMessage data)
     {
         RoleDiscoveryComplete event = new RoleDiscoveryComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -597,7 +596,7 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteAutomaticFlushTimeoutComplete buildWriteAutomaticFlushTimeoutComplete(IoCtlMessage data)
+    private WriteAutomaticFlushTimeoutComplete buildWriteAutomaticFlushTimeoutComplete(BinaryMessage data)
     {
         WriteAutomaticFlushTimeoutComplete event = new WriteAutomaticFlushTimeoutComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -605,7 +604,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadTransmitPowerLevelComplete buildReadTransmitPowerLevelComplete(IoCtlMessage data)
+    private ReadTransmitPowerLevelComplete buildReadTransmitPowerLevelComplete(BinaryMessage data)
     {
         ReadTransmitPowerLevelComplete event = new ReadTransmitPowerLevelComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -614,7 +613,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadLinkQualityComplete buildReadLinkQualityComplete(IoCtlMessage data)
+    private ReadLinkQualityComplete buildReadLinkQualityComplete(BinaryMessage data)
     {
         ReadLinkQualityComplete event = new ReadLinkQualityComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -623,7 +622,7 @@ public class EventDecoder {
         return event;
     }
 
-    private ReadLinkSupervisionTimeoutComplete buildReadLinkSupervisionTimeoutComplete(IoCtlMessage data)
+    private ReadLinkSupervisionTimeoutComplete buildReadLinkSupervisionTimeoutComplete(BinaryMessage data)
     {
         ReadLinkSupervisionTimeoutComplete event = new ReadLinkSupervisionTimeoutComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -632,7 +631,7 @@ public class EventDecoder {
         return event;
     }
 
-    private WriteLinkPolicySettingsComplete buildWriteLinkPolicySettingsComplete(IoCtlMessage data)
+    private WriteLinkPolicySettingsComplete buildWriteLinkPolicySettingsComplete(BinaryMessage data)
     {
         WriteLinkPolicySettingsComplete event = new WriteLinkPolicySettingsComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -640,14 +639,14 @@ public class EventDecoder {
         return event;
     }
 
-    private InquiryCancelComplete buildInquiryCancelComplete(IoCtlMessage data)
+    private InquiryCancelComplete buildInquiryCancelComplete(BinaryMessage data)
     {
         InquiryCancelComplete event = new InquiryCancelComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private LinkKeyRequestNegativeReplyComplete buildLinkKeyRequestNegativeReplyComplete(IoCtlMessage data)
+    private LinkKeyRequestNegativeReplyComplete buildLinkKeyRequestNegativeReplyComplete(BinaryMessage data)
     {
         LinkKeyRequestNegativeReplyComplete event = new LinkKeyRequestNegativeReplyComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -655,7 +654,7 @@ public class EventDecoder {
         return event;
     }
 
-    private PinCodeRequestReplyComplete buildPinCodeRequestReplyComplete(IoCtlMessage data)
+    private PinCodeRequestReplyComplete buildPinCodeRequestReplyComplete(BinaryMessage data)
     {
         PinCodeRequestReplyComplete event = new PinCodeRequestReplyComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -664,7 +663,7 @@ public class EventDecoder {
     }
 
 
-    private WriteLinkSupervisionTimeoutComplete buildWriteLinkSupervisionTimeoutComplete(IoCtlMessage data)
+    private WriteLinkSupervisionTimeoutComplete buildWriteLinkSupervisionTimeoutComplete(BinaryMessage data)
     {
         WriteLinkSupervisionTimeoutComplete event = new WriteLinkSupervisionTimeoutComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
@@ -672,7 +671,7 @@ public class EventDecoder {
         return event;
     }
 
-    private EventInquiryResult buildInquiryResult(IoCtlMessage data)
+    private EventInquiryResult buildInquiryResult(BinaryMessage data)
     {
         EventInquiryResult event = new EventInquiryResult();
         event.setNumResponses(data.read1octet());
@@ -691,14 +690,14 @@ public class EventDecoder {
         return event;
     }
 
-    private PeriodicInquiryModeComplete buildPeriodicInquiryModeComplete(IoCtlMessage data)
+    private PeriodicInquiryModeComplete buildPeriodicInquiryModeComplete(BinaryMessage data)
     {
         PeriodicInquiryModeComplete event = new PeriodicInquiryModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 
-    private ExitPeriodicInquiryModeComplete buildExitPeriodicInquiryModeComplete(IoCtlMessage data)
+    private ExitPeriodicInquiryModeComplete buildExitPeriodicInquiryModeComplete(BinaryMessage data)
     {
         ExitPeriodicInquiryModeComplete event = new ExitPeriodicInquiryModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));

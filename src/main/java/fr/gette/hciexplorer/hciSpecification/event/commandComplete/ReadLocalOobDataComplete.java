@@ -2,7 +2,7 @@ package fr.gette.hciexplorer.hciSpecification.event.commandComplete;
 
 import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,7 @@ public class ReadLocalOobDataComplete extends EventCommandComplete {
     private BigInteger hashC;
     private BigInteger randomizerR;
 
-    public void setHashC(IoCtlMessage data)
+    public void setHashC(BinaryMessage data)
     {
         hashC = BigInteger.ZERO;
         for (int i=0; i<16; i++)
@@ -28,7 +28,7 @@ public class ReadLocalOobDataComplete extends EventCommandComplete {
         }
     }
 
-    public void setRandomizerR(IoCtlMessage data)
+    public void setRandomizerR(BinaryMessage data)
     {
         randomizerR = BigInteger.ZERO;
         for (int i=0; i<16; i++)

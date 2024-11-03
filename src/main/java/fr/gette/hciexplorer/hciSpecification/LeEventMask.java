@@ -1,8 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.event.EventCode;
 import fr.gette.hciexplorer.hciSpecification.event.LeEventCode;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +26,7 @@ public class LeEventMask {
         eventBit.put(LeEventCode.LE_LONG_TERM_KEY_REQUEST, 0*8+5);
     }
 
-    public LeEventMask(IoCtlMessage data)
+    public LeEventMask(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<8; i++)

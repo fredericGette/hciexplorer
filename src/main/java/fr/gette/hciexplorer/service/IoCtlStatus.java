@@ -1,4 +1,4 @@
-package fr.gette.hciexplorer.hciSpecification.ioCtlHelper;
+package fr.gette.hciexplorer.service;
 
 import java.util.HashMap;
 import java.util.Map;

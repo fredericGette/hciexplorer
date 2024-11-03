@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import fr.gette.hciexplorer.hciSpecification.AclDirection;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import fr.gette.hciexplorer.service.CommandDecoder;
 import fr.gette.hciexplorer.service.DataDecoder;
 import fr.gette.hciexplorer.service.EventDecoder;
@@ -16,10 +16,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -52,9 +49,9 @@ public class HciexplorerRunner  implements CommandLineRunner {
                 break;
             }
 
-            IoCtlMessage ioctlMessage = null;
+            BinaryMessage ioctlMessage = null;
             try {
-                ioctlMessage = new IoCtlMessage(data);
+                ioctlMessage = new BinaryMessage(data);
             }
             catch (NumberFormatException e)
             {

@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,7 +50,7 @@ public class SupportedLeStates
         stateBit.put(LeState.INITIATING_AND_MASTER_ROLE_COMBINATION, 3*8+4);
     }
 
-    public SupportedLeStates(IoCtlMessage data)
+    public SupportedLeStates(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<8; i++)

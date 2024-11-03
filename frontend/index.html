@@ -89,7 +89,7 @@
     function getStringProperties(obj) {
         let result = "";
         Object.entries(obj).map(([key, value]) => {
-            if (key == "id" || key == "parentId" || key == "beginTimestamp" || key == "endTimestamp" || key == "type" || key == "code" || key == "direction" || key == "data" || key == "dataString" || key == "opCode" || key == "commandOpCode" || key == "status" || key == "ioCtlStatus")
+            if (key == "id" || key == "parentId" || key == "beginTimestamp" || key == "endTimestamp" || key == "type" || key == "commandCode" || key == "direction" || key == "data" || key == "dataString" || key == "opCode" || key == "commandOpCode" || key == "status" || key == "ioCtlStatus")
             {
                 return;
             }
@@ -199,8 +199,8 @@
                     const divTitle = document.createElement("div");
                     divTitle.classList.add('title');
                     divBloc.appendChild(divTitle);
-                    divTitle.innerHTML += ""+bloc.event.code;
-                    if (bloc.event.code == "COMMAND_COMPLETE")
+                    divTitle.innerHTML += ""+bloc.event.commandCode;
+                    if (bloc.event.commandCode == "COMMAND_COMPLETE")
                     {
                         divTitle.innerHTML += " "+bloc.event.commandOpCode;
                     }
@@ -210,7 +210,7 @@
                     divBloc.appendChild(divId);
                     divId.innerHTML += ""+bloc.event.id.toString(16).toUpperCase();
 
-                    if (bloc.event.code == "COMMAND_COMPLETE")
+                    if (bloc.event.commandCode == "COMMAND_COMPLETE")
                     {
                         const divStatus = document.createElement("div");
                         divStatus.classList.add('status');
@@ -223,7 +223,7 @@
                     divBloc.appendChild(divContent1);
                     divContent1.innerHTML += getStringProperties(bloc.event);
 
-                    if (bloc.event.code == "EXTENDED_INQUIRY_RESULT") console.log(bloc.event)
+                    if (bloc.event.commandCode == "EXTENDED_INQUIRY_RESULT") console.log(bloc.event)
                 }
                 else
                 {

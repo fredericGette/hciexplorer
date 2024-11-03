@@ -3,6 +3,7 @@ package fr.gette.hciexplorer.hciSpecification.data;
 import fr.gette.hciexplorer.hciSpecification.AclDirection;
 import fr.gette.hciexplorer.hciSpecification.HciMessage;
 import fr.gette.hciexplorer.hciSpecification.HciPacketType;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class AclData extends HciMessage {
     private short broadcastFlag;
     private int dataTotalLength;
     private short[] data;
+    private Frame l2capPacket;
 
     public String getPacketBoundaryFlagDescription()
     {
@@ -78,5 +80,7 @@ public class AclData extends HciMessage {
         valueHexString.append(valueCharString);
         return valueHexString.toString();
     }
+
+
 
 }

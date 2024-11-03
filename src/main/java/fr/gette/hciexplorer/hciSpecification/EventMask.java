@@ -1,7 +1,7 @@
 package fr.gette.hciexplorer.hciSpecification;
 
 import fr.gette.hciexplorer.hciSpecification.event.EventCode;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -70,7 +70,7 @@ public class EventMask {
         eventBit.put(EventCode.LE_META_EVENT, 7*8+6);
     }
 
-    public EventMask(IoCtlMessage data)
+    public EventMask(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<8; i++)

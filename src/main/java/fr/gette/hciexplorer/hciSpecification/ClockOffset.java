@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +14,7 @@ public class ClockOffset
 {
     private BigInteger value;
 
-    public ClockOffset(IoCtlMessage data)
+    public ClockOffset(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<2; i++)

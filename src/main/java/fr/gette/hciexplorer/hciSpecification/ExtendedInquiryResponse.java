@@ -3,7 +3,7 @@ package fr.gette.hciexplorer.hciSpecification;
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirCompleteLocalName;
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirDataType;
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirTxPowerLevel;
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import fr.gette.hciexplorer.hciSpecification.extendedInquiryResponse.EirData;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +18,7 @@ public class ExtendedInquiryResponse {
 
     List<EirData> eirData;
 
-    public ExtendedInquiryResponse(IoCtlMessage data)
+    public ExtendedInquiryResponse(BinaryMessage data)
     {
         eirData = new ArrayList<>();
 

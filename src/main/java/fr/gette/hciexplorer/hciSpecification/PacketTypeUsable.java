@@ -1,6 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification;
 
-import fr.gette.hciexplorer.hciSpecification.ioCtlHelper.IoCtlMessage;
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +32,7 @@ public class PacketTypeUsable {
         packetTypeBit.put(PacketType.DH5, 1*8+7);
     }
 
-    public PacketTypeUsable(IoCtlMessage data)
+    public PacketTypeUsable(BinaryMessage data)
     {
         value = BigInteger.ZERO;
         for (int i=0; i<2; i++)
