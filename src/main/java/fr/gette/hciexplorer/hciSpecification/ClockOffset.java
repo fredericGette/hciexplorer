@@ -32,7 +32,6 @@ public class ClockOffset
     public int getCLKslaveCLKmaster()
     {
         BigInteger value14_0 = value.and(BigInteger.valueOf(0x7FFF));
-        BigInteger value16_2 = value14_0.shiftLeft(2);
-        return value16_2.intValue();
+        return value14_0.intValue();
     }
 }

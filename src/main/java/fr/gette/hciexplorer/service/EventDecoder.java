@@ -152,6 +152,8 @@ public class EventDecoder {
             case LINK_KEY_REQUEST_NEGATIVE_REPLY -> event = buildLinkKeyRequestNegativeReplyComplete(data);
             case PIN_CODE_REQUEST_REPLY -> event = buildPinCodeRequestReplyComplete(data);
             case WRITE_LINK_SUPERVISION_TIMEOUT -> event = buildWriteLinkSupervisionTimeoutComplete(data);
+            case PERIODIC_INQUIRY_MODE -> event = buildPeriodicInquiryModeComplete(data);
+            case EXIT_PERIODIC_INQUIRY_MODE -> event = buildExitPeriodicInquiryModeComplete(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -686,6 +688,20 @@ public class EventDecoder {
             results.add(result);
         }
         event.setInquiryResult(results);
+        return event;
+    }
+
+    private PeriodicInquiryModeComplete buildPeriodicInquiryModeComplete(IoCtlMessage data)
+    {
+        PeriodicInquiryModeComplete event = new PeriodicInquiryModeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private ExitPeriodicInquiryModeComplete buildExitPeriodicInquiryModeComplete(IoCtlMessage data)
+    {
+        ExitPeriodicInquiryModeComplete event = new ExitPeriodicInquiryModeComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
         return event;
     }
 }

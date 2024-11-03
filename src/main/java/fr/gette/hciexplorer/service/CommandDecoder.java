@@ -127,6 +127,8 @@ public class CommandDecoder {
             case SET_CONNECTION_ENCRYPTION -> command = buildSetConnectionEncryption(data);
             case EXIT_SNIFF_MODE -> command = buildExitSniffMode(data);
             case WRITE_LINK_SUPERVISION_TIMEOUT -> command = buildExitSniffMode(data);
+            case PERIODIC_INQUIRY_MODE -> command = buildPeriodicInquiryMode(data);
+            case EXIT_PERIODIC_INQUIRY_MODE -> command = buildExitPeriodicInquiryMode(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -447,6 +449,21 @@ public class CommandDecoder {
         WriteLinkSupervisionTimeout command = new WriteLinkSupervisionTimeout();
         command.setConnectionHandle(data.read2octets());
         command.setLinkSupervisionTimeout(data.read2octets());
+        return command;
+    }
+
+    private Command buildPeriodicInquiryMode(IoCtlMessage data) {
+        PeriodicInquiryMode command = new PeriodicInquiryMode();
+        command.setMaxPeriodLength(data.read2octets());
+        command.setMinPeriodLength(data.read2octets());
+        command.setLap(new LAP(data));
+        command.setInquiryLength(data.read1octet());
+        command.setNumResponses(data.read1octet());
+        return command;
+    }
+
+    private Command buildExitPeriodicInquiryMode(IoCtlMessage data) {
+        ExitPeriodicInquiryMode command = new ExitPeriodicInquiryMode();
         return command;
     }
 }
