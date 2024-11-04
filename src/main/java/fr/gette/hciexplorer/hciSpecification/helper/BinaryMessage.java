@@ -109,4 +109,8 @@ public class BinaryMessage {
     {
         offset = 0;
     }
+
+    public boolean hasRemaining() {
+        return getDataLength() > offset;
+    }
 }

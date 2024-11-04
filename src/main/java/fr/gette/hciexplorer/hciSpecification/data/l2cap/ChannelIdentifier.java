@@ -26,6 +26,6 @@ public final class ChannelIdentifier {
                 }
             }
         }
-        return description;
+        return String.format("0x%04X - %s", value, description);
     }
 }

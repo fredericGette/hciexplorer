@@ -6,7 +6,12 @@ import java.util.Map;
 public enum CommandCode {
     RESERVED(0x00),
     COMMAND_REJECT(0x01),
-    CONNECTION_REQUEST(0x02);
+    CONNECTION_REQUEST(0x02),
+    CONNECTION_RESPONSE(0x03),
+    CONFIGURATION_REQUEST(0x04),
+    CONFIGURATION_RESPONSE(0x05),
+    DISCONNECTION_REQUEST(0x06),
+    DISCONNECTION_RESPONSE(0x07);
 
     private static final Map<Integer, CommandCode> byCode = new HashMap<>();
     static {
@@ -17,12 +22,8 @@ public enum CommandCode {
         }
     }
 
-    public static CommandCode get(Integer code) {
-        return byCode.get(code);
-    }
-
-    public static CommandCode get(Short code) {
-        return byCode.get(code.intValue());
+    public static CommandCode get(int code) {
+        return byCode.get(Integer.valueOf(code));
     }
 
     private final int code;
