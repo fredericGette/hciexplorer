@@ -1,6 +1,7 @@
 package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.SimpleDataFrame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.signaling.*;
 import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,7 @@ public class L2capDecoder {
         switch (cid){
             case 0x0001 -> packet = buildSignalingPacket(data);
             case 0x0005 -> packet = buildSignalingPacket(data);
-            default -> throw new UnsupportedOperationException(
-                    String.format("CID : 0x%04X",cid));
+            default -> packet = buildSimpleDataFrame(data);
         }
         packet.setCID(cid);
 
@@ -93,6 +93,8 @@ public class L2capDecoder {
         ConnectionResponse command = new ConnectionResponse();
         command.setDestinationCID(data.read2octets());
         command.setSourceCID(data.read2octets());
+        command.setResult(data.read2octets());
+        command.setStatus(data.read2octets());
         return command;
     }
 
@@ -118,5 +120,11 @@ public class L2capDecoder {
         command.setDestinationCID(data.read2octets());
         command.setSourceCID(data.read2octets());
         return command;
+    }
+
+    private SimpleDataFrame buildSimpleDataFrame(BinaryMessage data){
+        SimpleDataFrame packet = new SimpleDataFrame();
+        packet.setData(data.readRemaining());
+        return packet;
     }
 }
