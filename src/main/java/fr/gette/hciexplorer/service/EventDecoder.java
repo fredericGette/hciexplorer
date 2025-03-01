@@ -7,6 +7,8 @@ import fr.gette.hciexplorer.hciSpecification.command.CommandCode;
 import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.*;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
+import fr.gette.hciexplorer.hciSpecification.event.leMetaEvent.LeConnectionCompleteEvent;
+import fr.gette.hciexplorer.hciSpecification.event.leMetaEvent.LeSubeventCode;
 import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +97,7 @@ public class EventDecoder {
             case AUTHENTICATION_COMPLETE -> event = buildAuthenticationComplete(data);
             case ENCRYPTION_CHANGE -> event = buildEncryptionChange(data);
             case INQUIRY_RESULT -> event = buildInquiryResult(data);
+            case LE_META_EVENT -> event = buildLeMetaEvent(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Event code: %s",eventCode));
         }
@@ -153,6 +156,9 @@ public class EventDecoder {
             case WRITE_LINK_SUPERVISION_TIMEOUT -> event = buildWriteLinkSupervisionTimeoutComplete(data);
             case PERIODIC_INQUIRY_MODE -> event = buildPeriodicInquiryModeComplete(data);
             case EXIT_PERIODIC_INQUIRY_MODE -> event = buildExitPeriodicInquiryModeComplete(data);
+            case LE_SET_ADVERTISE_ENABLE -> event = buildLeSetAdvertiseEnable(data);
+            case LE_SET_ADVERTISING_PARAMETERS -> event = buildLeSetAdvertisingParameters(data);
+            case LE_SET_ADVERTISING_DATA -> event = buildLeSetAdvertisingData(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -690,6 +696,17 @@ public class EventDecoder {
         return event;
     }
 
+    private Event buildLeMetaEvent(BinaryMessage data) {
+        Event event;
+        LeSubeventCode subeventCode = LeSubeventCode.get(data.read1octet());
+        switch (subeventCode) {
+            case LE_CONNECTION_COMPLETE_EVENT -> event = buildLeConnectionCompleteEvent(data);
+            default -> throw new UnsupportedOperationException(
+                    String.format("LE Subevent code: %s",subeventCode));
+        }
+        return event;
+    }
+
     private PeriodicInquiryModeComplete buildPeriodicInquiryModeComplete(BinaryMessage data)
     {
         PeriodicInquiryModeComplete event = new PeriodicInquiryModeComplete();
@@ -701,6 +718,42 @@ public class EventDecoder {
     {
         ExitPeriodicInquiryModeComplete event = new ExitPeriodicInquiryModeComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeSetAdvertiseEnableComplete buildLeSetAdvertiseEnable(BinaryMessage data)
+    {
+        LeSetAdvertiseEnableComplete event = new LeSetAdvertiseEnableComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeSetAdvertisingParametersComplete buildLeSetAdvertisingParameters(BinaryMessage data)
+    {
+        LeSetAdvertisingParametersComplete event = new LeSetAdvertisingParametersComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeSetAdvertisingDataComplete buildLeSetAdvertisingData(BinaryMessage data)
+    {
+        LeSetAdvertisingDataComplete event = new LeSetAdvertisingDataComplete();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeConnectionCompleteEvent buildLeConnectionCompleteEvent(BinaryMessage data)
+    {
+        LeConnectionCompleteEvent event = new LeConnectionCompleteEvent();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
+        event.setRole(data.read1octet());
+        event.setPeerAddressType(data.read1octet());
+        event.setPeerAddress(new BluetoothAddress(data));
+        event.setConnInterval(data.read2octets());
+        event.setConnLatency(data.read2octets());
+        event.setSupervisionTimeout(data.read2octets());
+        event.setMasterClockAccuracy(data.read1octet());
         return event;
     }
 }

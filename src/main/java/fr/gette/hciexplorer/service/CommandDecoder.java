@@ -128,6 +128,9 @@ public class CommandDecoder {
             case WRITE_LINK_SUPERVISION_TIMEOUT -> command = buildExitSniffMode(data);
             case PERIODIC_INQUIRY_MODE -> command = buildPeriodicInquiryMode(data);
             case EXIT_PERIODIC_INQUIRY_MODE -> command = buildExitPeriodicInquiryMode(data);
+            case LE_SET_ADVERTISING_PARAMETERS -> command = buildLeSetAdvertisingParameters(data);
+            case LE_SET_ADVERTISING_DATA -> command = buildLeSetAdvertisingData(data);
+            case LE_SET_ADVERTISE_ENABLE -> command = buildLeSetAdvertiseEnable(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -463,6 +466,31 @@ public class CommandDecoder {
 
     private Command buildExitPeriodicInquiryMode(BinaryMessage data) {
         ExitPeriodicInquiryMode command = new ExitPeriodicInquiryMode();
+        return command;
+    }
+
+    private Command buildLeSetAdvertisingParameters(BinaryMessage data) {
+        LeSetAdvertisingParameters command = new LeSetAdvertisingParameters();
+        command.setAdvertisingIntervalMin(data.read2octets());
+        command.setAdvertisingIntervalMax(data.read2octets());
+        command.setAdvertisingType(data.read1octet());
+        command.setOwnAddressType(data.read1octet());
+        command.setDirectAddressType(data.read1octet());
+        command.setDirectAddress(new BluetoothAddress(data));
+        command.setAdvertisingChannelMap(data.read1octet());
+        command.setAdvertisingFilterPolicy(data.read1octet());
+        return command;
+    }
+
+    private Command buildLeSetAdvertisingData(BinaryMessage data) {
+        LeSetAdvertisingData command = new LeSetAdvertisingData();
+        command.setAdvertisingData(new AdvertisingOrScanResponseData(data));
+        return command;
+    }
+
+    private Command buildLeSetAdvertiseEnable(BinaryMessage data) {
+        LeSetAdvertiseEnable command = new LeSetAdvertiseEnable();
+        command.setAdvertisingEnable(data.read1octet());
         return command;
     }
 }
