@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 @Getter
 @Setter
 public class ConfigurationResponse extends SignalingPacket {
-    private CommandCode commandCode = CommandCode.CONFIGURATION_RESPONSE;
+    private SignalingCommandCode commandCode = SignalingCommandCode.CONFIGURATION_RESPONSE;
     private int sourceCID;
     private ConfigurationFlags flags;
     private int result;

@@ -11,5 +11,5 @@ import lombok.Setter;
 public abstract class SignalingPacket extends Frame {
     private short identifier;
 
-    public abstract CommandCode getCommandCode();
+    public abstract SignalingCommandCode getCommandCode();
 }

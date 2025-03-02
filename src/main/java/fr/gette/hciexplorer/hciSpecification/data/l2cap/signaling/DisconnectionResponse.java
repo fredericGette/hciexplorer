@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class DisconnectionResponse extends SignalingPacket {
-    private CommandCode commandCode = CommandCode.DISCONNECTION_RESPONSE;
+    private SignalingCommandCode commandCode = SignalingCommandCode.DISCONNECTION_RESPONSE;
     private int destinationCID;
     private int sourceCID;
 

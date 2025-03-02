@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public abstract class CommandReject extends SignalingPacket {
-    private CommandCode commandCode = CommandCode.COMMAND_REJECT;
+    private SignalingCommandCode commandCode = SignalingCommandCode.COMMAND_REJECT;
     private int reason;
 
     public abstract String getReasonDescription();

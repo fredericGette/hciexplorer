@@ -1,7 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification.data.l2cap.signaling;
 
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.ChannelIdentifier;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.ProtocolServiceMultiplexer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ConnectionResponse extends SignalingPacket {
-    private CommandCode commandCode = CommandCode.CONNECTION_RESPONSE;
+    private SignalingCommandCode commandCode = SignalingCommandCode.CONNECTION_RESPONSE;
     private int destinationCID;
     private int sourceCID;
     private int result;

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ConnectionRequest extends SignalingPacket {
-    private CommandCode commandCode = CommandCode.CONNECTION_REQUEST;
+    private SignalingCommandCode commandCode = SignalingCommandCode.CONNECTION_REQUEST;
     private int psm;
     private int sourceCID;
 
