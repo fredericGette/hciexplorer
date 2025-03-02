@@ -2,7 +2,11 @@ package fr.gette.hciexplorer.service;
 
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.SimpleDataFrame;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributeOpcode;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributePacket;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.ExchangeMTURequest;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.PairingRequest;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.PairingResponse;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.SecurityManagerCommandCode;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.SecurityManagerPacket;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.signaling.*;
@@ -25,6 +29,7 @@ public class L2capDecoder {
 
         switch (cid){
             case 0x0001 -> packet = buildSignalingPacket(data);
+            case 0x0004 -> packet = buildAttributePacket(data);
             case 0x0005 -> packet = buildSignalingPacket(data);
             case 0x0006 -> packet = buildSecurityManagerProtocolPacket(data);
             default -> packet = buildSimpleDataFrame(data);
@@ -64,10 +69,24 @@ public class L2capDecoder {
 
         switch (commandCode){
             case PAIRING_REQUEST -> packet = buildPairingRequest(data);
+            case PAIRING_RESPONSE -> packet = buildPairingResponse(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", commandCode));
         }
 
+        return packet;
+    }
+
+    private AttributePacket buildAttributePacket(BinaryMessage data) {
+        AttributePacket packet;
+
+        AttributeOpcode opcode = AttributeOpcode.get(data.read1octet());
+
+        switch (opcode){
+            case EXCHANGE_MTU_REQUEST -> packet = buildExchangeMTURequest(data);
+            default -> throw new UnsupportedOperationException(
+                    String.format("Code : %s", opcode));
+        }
         return packet;
     }
 
@@ -154,6 +173,23 @@ public class L2capDecoder {
         packet.setMaximumEncryptionKeySize(data.read1octet());
         packet.setInitiatorKeyDistribution(data.read1octet());
         packet.setResponderKeyDistribution(data.read1octet());
+        return packet;
+    }
+
+    private PairingResponse buildPairingResponse(BinaryMessage data){
+        PairingResponse packet = new PairingResponse();
+        packet.setIOCapability(data.read1octet());
+        packet.setOOBDataFlag(data.read1octet());
+        packet.setAuthReq(data.read1octet());
+        packet.setMaximumEncryptionKeySize(data.read1octet());
+        packet.setInitiatorKeyDistribution(data.read1octet());
+        packet.setResponderKeyDistribution(data.read1octet());
+        return packet;
+    }
+
+    private ExchangeMTURequest buildExchangeMTURequest(BinaryMessage data){
+        ExchangeMTURequest packet = new ExchangeMTURequest();
+        packet.setClientRxMTU(data.read2octets());
         return packet;
     }
 }
