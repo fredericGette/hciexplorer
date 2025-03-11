@@ -1,14 +1,12 @@
 package fr.gette.hciexplorer.service;
 
+import fr.gette.hciexplorer.hciSpecification.ConfirmValue;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.SimpleDataFrame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributeOpcode;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributePacket;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.ExchangeMTURequest;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.PairingRequest;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.PairingResponse;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.SecurityManagerCommandCode;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.SecurityManagerPacket;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.*;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.signaling.*;
 import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +68,7 @@ public class L2capDecoder {
         switch (commandCode){
             case PAIRING_REQUEST -> packet = buildPairingRequest(data);
             case PAIRING_RESPONSE -> packet = buildPairingResponse(data);
+            case PAIRING_CONFIRM -> packet = buildPairingConfirm(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", commandCode));
         }
@@ -184,6 +183,12 @@ public class L2capDecoder {
         packet.setMaximumEncryptionKeySize(data.read1octet());
         packet.setInitiatorKeyDistribution(data.read1octet());
         packet.setResponderKeyDistribution(data.read1octet());
+        return packet;
+    }
+
+    private PairingConfirm buildPairingConfirm(BinaryMessage data){
+        PairingConfirm packet = new PairingConfirm();
+        packet.setConfirmValue(new ConfirmValue(data));
         return packet;
     }
 
