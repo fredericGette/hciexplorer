@@ -8,6 +8,7 @@ import fr.gette.hciexplorer.hciSpecification.command.ErrorCode;
 import fr.gette.hciexplorer.hciSpecification.event.*;
 import fr.gette.hciexplorer.hciSpecification.event.commandComplete.*;
 import fr.gette.hciexplorer.hciSpecification.event.leMetaEvent.LeConnectionCompleteEvent;
+import fr.gette.hciexplorer.hciSpecification.event.leMetaEvent.LeLongTermKeyRequestEvent;
 import fr.gette.hciexplorer.hciSpecification.event.leMetaEvent.LeSubeventCode;
 import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.RequiredArgsConstructor;
@@ -701,6 +702,7 @@ public class EventDecoder {
         LeSubeventCode subeventCode = LeSubeventCode.get(data.read1octet());
         switch (subeventCode) {
             case LE_CONNECTION_COMPLETE_EVENT -> event = buildLeConnectionCompleteEvent(data);
+            case LE_LONG_TERM_KEY_REQUEST_EVENT -> event = buildLeLongTermKeyRequestEvent(data);
             default -> throw new UnsupportedOperationException(
                     String.format("LE Subevent code: %s",subeventCode));
         }
@@ -754,6 +756,15 @@ public class EventDecoder {
         event.setConnLatency(data.read2octets());
         event.setSupervisionTimeout(data.read2octets());
         event.setMasterClockAccuracy(data.read1octet());
+        return event;
+    }
+
+    private LeLongTermKeyRequestEvent buildLeLongTermKeyRequestEvent(BinaryMessage data)
+    {
+        LeLongTermKeyRequestEvent event = new LeLongTermKeyRequestEvent();
+        event.setConnectionHandle(data.read2octets());
+        event.setRandomNumber(new EightByteValue(data));
+        event.setEncryptedDiversifier(data.read2octets());
         return event;
     }
 }

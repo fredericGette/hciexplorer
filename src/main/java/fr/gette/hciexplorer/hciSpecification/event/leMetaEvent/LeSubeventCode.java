@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum LeSubeventCode {
-    LE_CONNECTION_COMPLETE_EVENT(0x01);
+    LE_CONNECTION_COMPLETE_EVENT(0x01),
+    LE_ADVERTISING_REPORT_EVENT(0x2),
+    LE_CONNECTION_UPDATE_COMPLETE_EVENT(0x3),
+    LE_READ_REMOTE_USED_FEATURES_COMPLETE_EVENT(0x4),
+    LE_LONG_TERM_KEY_REQUEST_EVENT(0x5);
 
     private static final Map<Integer, LeSubeventCode> byCode = new HashMap<Integer, LeSubeventCode>();
     static {

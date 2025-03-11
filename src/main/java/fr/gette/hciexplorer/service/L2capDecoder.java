@@ -1,6 +1,7 @@
 package fr.gette.hciexplorer.service;
 
-import fr.gette.hciexplorer.hciSpecification.ConfirmValue;
+import fr.gette.hciexplorer.hciSpecification.EightByteValue;
+import fr.gette.hciexplorer.hciSpecification.SixteenByteValue;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.SimpleDataFrame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributeOpcode;
@@ -69,6 +70,10 @@ public class L2capDecoder {
             case PAIRING_REQUEST -> packet = buildPairingRequest(data);
             case PAIRING_RESPONSE -> packet = buildPairingResponse(data);
             case PAIRING_CONFIRM -> packet = buildPairingConfirm(data);
+            case PAIRING_RANDOM -> packet = buildPairingRandom(data);
+            case PAIRING_FAILED -> packet = buildPairingFailed(data);
+            case ENCRYPTION_INFORMATION -> packet = buildEncryptionInformation(data);
+            case MASTER_IDENTIFICATION -> packet = buildMasterIdentification(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", commandCode));
         }
@@ -188,7 +193,32 @@ public class L2capDecoder {
 
     private PairingConfirm buildPairingConfirm(BinaryMessage data){
         PairingConfirm packet = new PairingConfirm();
-        packet.setConfirmValue(new ConfirmValue(data));
+        packet.setConfirmValue(new SixteenByteValue(data));
+        return packet;
+    }
+
+    private PairingRandom buildPairingRandom(BinaryMessage data){
+        PairingRandom packet = new PairingRandom();
+        packet.setRandomValue(new SixteenByteValue(data));
+        return packet;
+    }
+
+    private PairingFailed buildPairingFailed(BinaryMessage data) {
+        PairingFailed packet = new PairingFailed();
+        packet.setReason(data.read1octet());
+        return packet;
+    }
+
+    private EncryptionInformation buildEncryptionInformation(BinaryMessage data) {
+        EncryptionInformation packet = new EncryptionInformation();
+        packet.setLongTermKey(new SixteenByteValue(data));
+        return packet;
+    }
+
+    private MasterIdentification buildMasterIdentification(BinaryMessage data) {
+        MasterIdentification packet = new MasterIdentification();
+        packet.setEdiv(data.read2octets());
+        packet.setRand(new EightByteValue(data));
         return packet;
     }
 
