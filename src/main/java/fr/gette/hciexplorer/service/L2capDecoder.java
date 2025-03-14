@@ -4,9 +4,7 @@ import fr.gette.hciexplorer.hciSpecification.EightByteValue;
 import fr.gette.hciexplorer.hciSpecification.SixteenByteValue;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.Frame;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.SimpleDataFrame;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributeOpcode;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.AttributePacket;
-import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.ExchangeMTURequest;
+import fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute.*;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.securityManager.*;
 import fr.gette.hciexplorer.hciSpecification.data.l2cap.signaling.*;
 import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
@@ -74,6 +72,7 @@ public class L2capDecoder {
             case PAIRING_FAILED -> packet = buildPairingFailed(data);
             case ENCRYPTION_INFORMATION -> packet = buildEncryptionInformation(data);
             case MASTER_IDENTIFICATION -> packet = buildMasterIdentification(data);
+            case SIGNING_INFORMATION -> packet = buildSigningInformation(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", commandCode));
         }
@@ -88,6 +87,7 @@ public class L2capDecoder {
 
         switch (opcode){
             case EXCHANGE_MTU_REQUEST -> packet = buildExchangeMTURequest(data);
+            case FIND_BY_TYPE_VALUE_REQUEST -> packet = buildFindByTypeValueRequest(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", opcode));
         }
@@ -222,9 +222,24 @@ public class L2capDecoder {
         return packet;
     }
 
+    private SigningInformation buildSigningInformation(BinaryMessage data) {
+        SigningInformation packet = new SigningInformation();
+        packet.setSignatureKey(new SixteenByteValue(data));
+        return packet;
+    }
+
     private ExchangeMTURequest buildExchangeMTURequest(BinaryMessage data){
         ExchangeMTURequest packet = new ExchangeMTURequest();
         packet.setClientRxMTU(data.read2octets());
+        return packet;
+    }
+
+    private FindByTypeValueRequest buildFindByTypeValueRequest(BinaryMessage data){
+        FindByTypeValueRequest packet = new FindByTypeValueRequest();
+        packet.setStartingHandle(data.read2octets());
+        packet.setEndingHandle(data.read2octets());
+        packet.setAttributeType(AttributeType.type16bits(data.read2octets()));
+        packet.setAttributeValue(data);
         return packet;
     }
 }
