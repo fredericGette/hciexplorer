@@ -160,6 +160,7 @@ public class EventDecoder {
             case LE_SET_ADVERTISE_ENABLE -> event = buildLeSetAdvertiseEnable(data);
             case LE_SET_ADVERTISING_PARAMETERS -> event = buildLeSetAdvertisingParameters(data);
             case LE_SET_ADVERTISING_DATA -> event = buildLeSetAdvertisingData(data);
+            case LE_LONG_TERM_KEY_REQUEST_REPLY -> event = buildLeLongTermKeyRequestReply(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Command Opcode : %s",commandOpcode));
         }
@@ -741,6 +742,14 @@ public class EventDecoder {
     {
         LeSetAdvertisingDataComplete event = new LeSetAdvertisingDataComplete();
         event.setStatus(ErrorCode.get(data.read1octet()));
+        return event;
+    }
+
+    private LeLongTermKeyRequestReply buildLeLongTermKeyRequestReply(BinaryMessage data)
+    {
+        LeLongTermKeyRequestReply event = new LeLongTermKeyRequestReply();
+        event.setStatus(ErrorCode.get(data.read1octet()));
+        event.setConnectionHandle(data.read2octets());
         return event;
     }
 

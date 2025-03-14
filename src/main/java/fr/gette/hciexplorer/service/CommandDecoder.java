@@ -131,6 +131,7 @@ public class CommandDecoder {
             case LE_SET_ADVERTISING_PARAMETERS -> command = buildLeSetAdvertisingParameters(data);
             case LE_SET_ADVERTISING_DATA -> command = buildLeSetAdvertisingData(data);
             case LE_SET_ADVERTISE_ENABLE -> command = buildLeSetAdvertiseEnable(data);
+            case LE_LONG_TERM_KEY_REQUEST_REPLY -> command = buildLeLongTermKeyRequestReply(data);
             default -> throw new UnsupportedOperationException(
                     String.format("OpCode : %s",opCode));
         }
@@ -491,6 +492,13 @@ public class CommandDecoder {
     private Command buildLeSetAdvertiseEnable(BinaryMessage data) {
         LeSetAdvertiseEnable command = new LeSetAdvertiseEnable();
         command.setAdvertisingEnable(data.read1octet());
+        return command;
+    }
+
+    private Command buildLeLongTermKeyRequestReply(BinaryMessage data) {
+        LeLongTermKeyRequestReply command = new LeLongTermKeyRequestReply();
+        command.setConnectionHandle(data.read2octets());
+        command.setLongTermKey(new SixteenByteValue(data));
         return command;
     }
 }

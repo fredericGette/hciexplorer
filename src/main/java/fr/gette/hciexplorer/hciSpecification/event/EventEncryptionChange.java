@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class EventEncryptionChange extends Event {
-    private EventCode code = EventCode.LINK_KEY_REQUEST;
+    private EventCode code = EventCode.ENCRYPTION_CHANGE;
     private ErrorCode status;
     private int connectionHandle;
     private EncryptionEnabled encryptionEnabled;
