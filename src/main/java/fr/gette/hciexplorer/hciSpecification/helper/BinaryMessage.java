@@ -105,6 +105,14 @@ public class BinaryMessage {
         return 0;
     }
 
+    public int getDataLengthRemaining()
+    {
+        if (data!= null) {
+            return data.length - offset;
+        }
+        return 0;
+    }
+
     public void resetOffset()
     {
         offset = 0;

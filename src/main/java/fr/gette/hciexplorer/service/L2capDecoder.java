@@ -86,8 +86,11 @@ public class L2capDecoder {
         AttributeOpcode opcode = AttributeOpcode.get(data.read1octet());
 
         switch (opcode){
+            case ERROR_RESPONSE -> packet = buildErrorResponse(data);
             case EXCHANGE_MTU_REQUEST -> packet = buildExchangeMTURequest(data);
+            case EXCHANGE_MTU_RESPONSE -> packet = buildExchangeMTUResponse(data);
             case FIND_BY_TYPE_VALUE_REQUEST -> packet = buildFindByTypeValueRequest(data);
+            case READ_BY_TYPE_REQUEST -> packet = buildReadByTypeRequest(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", opcode));
         }
@@ -228,9 +231,23 @@ public class L2capDecoder {
         return packet;
     }
 
+    private ErrorResponse buildErrorResponse(BinaryMessage data){
+        ErrorResponse packet = new ErrorResponse();
+        packet.setOpcode(AttributeOpcode.get(data.read1octet()));
+        packet.setAttributeHandleInError(data.read2octets());
+        packet.setErrorCode(data.read1octet());
+        return packet;
+    }
+
     private ExchangeMTURequest buildExchangeMTURequest(BinaryMessage data){
         ExchangeMTURequest packet = new ExchangeMTURequest();
         packet.setClientRxMTU(data.read2octets());
+        return packet;
+    }
+
+    private ExchangeMTUResponse buildExchangeMTUResponse(BinaryMessage data){
+        ExchangeMTUResponse packet = new ExchangeMTUResponse();
+        packet.setServerRxMTU(data.read2octets());
         return packet;
     }
 
@@ -238,8 +255,16 @@ public class L2capDecoder {
         FindByTypeValueRequest packet = new FindByTypeValueRequest();
         packet.setStartingHandle(data.read2octets());
         packet.setEndingHandle(data.read2octets());
-        packet.setAttributeType(AttributeType.type16bits(data.read2octets()));
+        packet.setAttributeType(new AttributeType(data.read2octets()));
         packet.setAttributeValue(data);
+        return packet;
+    }
+
+    private ReadByTypeRequest buildReadByTypeRequest(BinaryMessage data){
+        ReadByTypeRequest packet = new ReadByTypeRequest();
+        packet.setStartingHandle(data.read2octets());
+        packet.setEndingHandle(data.read2octets());
+        packet.setAttributeType(new AttributeType(data));
         return packet;
     }
 }

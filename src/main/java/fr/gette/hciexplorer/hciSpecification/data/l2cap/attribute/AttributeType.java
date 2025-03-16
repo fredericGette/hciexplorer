@@ -1,5 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute;
 
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +13,21 @@ import java.util.UUID;
 public class AttributeType {
     private UUID uuid;
 
-    public static AttributeType type16bits(int type)
+    public AttributeType(int twoBytes)
     {
-        AttributeType attributeType = new AttributeType();
-        attributeType.uuid = UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", type));
-        return attributeType;
+        uuid = UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", twoBytes));
+    }
+
+    public AttributeType(BinaryMessage data)
+    {
+        if (data.getDataLengthRemaining() == 2)
+        {
+            uuid = UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", data.read2octets()));
+        }
+        else
+        {
+            throw new UnsupportedOperationException("Cannot create 16 bytes UUID");
+        }
     }
 
     public String getDescription()
@@ -25,6 +36,7 @@ public class AttributeType {
         switch(uuid.toString())
         {
             case "00002800-0000-1000-8000-00805f9b34fb" -> description = "GATT Primary Service Declaration";
+            case "00002b3a-0000-1000-8000-00805f9b34fb" -> description = "Server Supported Features";
             default -> description = "Unknown";
         }
         return description;
