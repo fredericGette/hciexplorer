@@ -14,8 +14,8 @@ import java.util.NoSuchElementException;
 @Setter
 public class AdvertisingOrScanResponseData {
 
-    short advertisingDataLength;
-    List<AdvertisingData> advertisingData;
+    private short advertisingDataLength;
+    private List<AdvertisingData> advertisingData;
 
     public AdvertisingOrScanResponseData(BinaryMessage data)
     {

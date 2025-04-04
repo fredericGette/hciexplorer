@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 @Setter
 public class ExtendedInquiryResponse {
 
-    List<EirData> eirData;
+    private List<EirData> eirData;
 
     public ExtendedInquiryResponse(BinaryMessage data)
     {

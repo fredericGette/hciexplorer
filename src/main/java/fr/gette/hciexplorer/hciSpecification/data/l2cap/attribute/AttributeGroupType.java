@@ -10,15 +10,15 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AttributeType {
+public class AttributeGroupType {
     private UUID uuid;
 
-    public AttributeType(int twoBytes)
+    public AttributeGroupType(int twoBytes)
     {
         uuid = UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", twoBytes));
     }
 
-    public AttributeType(BinaryMessage data)
+    public AttributeGroupType(BinaryMessage data)
     {
         if (data.getDataLengthRemaining() == 2)
         {
@@ -36,9 +36,6 @@ public class AttributeType {
         switch(uuid.toString())
         {
             case "00002800-0000-1000-8000-00805f9b34fb" -> description = "GATT Primary Service Declaration";
-            case "00002803-0000-1000-8000-00805f9b34fb" -> description = "GATT Characteristic Declaration";
-            case "00002a04-0000-1000-8000-00805f9b34fb" -> description = "Peripheral Preferred Connection Parameters";
-            case "00002a50-0000-1000-8000-00805f9b34fb" -> description = "PnP ID";
             case "00002b3a-0000-1000-8000-00805f9b34fb" -> description = "Server Supported Features";
             default -> description = "Unknown";
         }

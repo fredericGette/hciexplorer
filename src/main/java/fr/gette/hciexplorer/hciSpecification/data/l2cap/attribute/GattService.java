@@ -24,7 +24,10 @@ public class GattService implements AttributeValue{
         String description;
         switch(uuid.toString())
         {
+            case "00001800-0000-1000-8000-00805f9b34fb" -> description = "Generic Access";
             case "00001801-0000-1000-8000-00805f9b34fb" -> description = "Generic Attribute";
+            case "0000180a-0000-1000-8000-00805f9b34fb" -> description = "Device Information";
+            case "00001812-0000-1000-8000-00805f9b34fb" -> description = "Human Interface Device";
             default -> description = "Unknown";
         }
         return description;

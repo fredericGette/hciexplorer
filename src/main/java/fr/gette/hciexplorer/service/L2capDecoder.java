@@ -91,6 +91,9 @@ public class L2capDecoder {
             case EXCHANGE_MTU_RESPONSE -> packet = buildExchangeMTUResponse(data);
             case FIND_BY_TYPE_VALUE_REQUEST -> packet = buildFindByTypeValueRequest(data);
             case READ_BY_TYPE_REQUEST -> packet = buildReadByTypeRequest(data);
+            case FIND_BY_TYPE_VALUE_RESPONSE -> packet = buildFindByTypeValueResponse(data);
+            case READ_BY_GROUP_TYPE_REQUEST -> packet = buildReadByGroupTypeRequest(data);
+            case READ_BY_GROUP_TYPE_RESPONSE -> packet = buildReadByGroupTypeResponse(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", opcode));
         }
@@ -233,7 +236,7 @@ public class L2capDecoder {
 
     private ErrorResponse buildErrorResponse(BinaryMessage data){
         ErrorResponse packet = new ErrorResponse();
-        packet.setOpcode(AttributeOpcode.get(data.read1octet()));
+        packet.setRequestOpcodeInError(AttributeOpcode.get(data.read1octet()));
         packet.setAttributeHandleInError(data.read2octets());
         packet.setErrorCode(data.read1octet());
         return packet;
@@ -265,6 +268,27 @@ public class L2capDecoder {
         packet.setStartingHandle(data.read2octets());
         packet.setEndingHandle(data.read2octets());
         packet.setAttributeType(new AttributeType(data));
+        return packet;
+    }
+
+    private FindByTypeValueResponse buildFindByTypeValueResponse(BinaryMessage data){
+        FindByTypeValueResponse packet = new FindByTypeValueResponse();
+        packet.setFoundAttributeHandle(data.read2octets());
+        packet.setGroupEndHandle(data.read2octets());
+        return packet;
+    }
+
+    private ReadByGroupTypeRequest buildReadByGroupTypeRequest(BinaryMessage data){
+        ReadByGroupTypeRequest packet = new ReadByGroupTypeRequest();
+        packet.setStartingHandle(data.read2octets());
+        packet.setEndingHandle(data.read2octets());
+        packet.setAttributeGroupType(new AttributeGroupType(data));
+        return packet;
+    }
+
+    private ReadByGroupTypeResponse buildReadByGroupTypeResponse(BinaryMessage data){
+        ReadByGroupTypeResponse packet = new ReadByGroupTypeResponse();
+        packet.setAttributeDataList(new AttributeDataList(data));
         return packet;
     }
 }
