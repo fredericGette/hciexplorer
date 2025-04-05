@@ -4,11 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class AttributeData {
-    private int attributeHandle;
+public class ServiceDeclaration extends AttributeData {
+    private int endGroupHandle;
+    private GattService attributeValue;
 }

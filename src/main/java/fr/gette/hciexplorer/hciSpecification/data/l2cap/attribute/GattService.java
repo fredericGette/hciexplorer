@@ -1,5 +1,6 @@
 package fr.gette.hciexplorer.hciSpecification.data.l2cap.attribute;
 
+import fr.gette.hciexplorer.hciSpecification.helper.BinaryMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +13,11 @@ import java.util.UUID;
 public class GattService implements AttributeValue{
     private UUID uuid;
 
-    public static GattService type16bits(int type)
+    public static GattService type16bits(BinaryMessage data)
     {
-        GattService gattService = new GattService();
-        gattService.uuid = UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", type));
-        return gattService;
+        GattService service = new GattService();
+        service.setUuid(UUID.fromString(String.format("0000%04X-0000-1000-8000-00805F9B34FB", data.read2octets())));
+        return service;
     }
 
     public String getDescription()

@@ -94,6 +94,7 @@ public class L2capDecoder {
             case FIND_BY_TYPE_VALUE_RESPONSE -> packet = buildFindByTypeValueResponse(data);
             case READ_BY_GROUP_TYPE_REQUEST -> packet = buildReadByGroupTypeRequest(data);
             case READ_BY_GROUP_TYPE_RESPONSE -> packet = buildReadByGroupTypeResponse(data);
+            case READ_BY_TYPE_RESPONSE -> packet = buildReadByTypeResponse(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", opcode));
         }
@@ -291,4 +292,12 @@ public class L2capDecoder {
         packet.setAttributeDataList(new AttributeDataList(data));
         return packet;
     }
+
+    private ReadByTypeResponse buildReadByTypeResponse(BinaryMessage data){
+        ReadByTypeResponse packet = new ReadByTypeResponse();
+        packet.setAttributeDataList(new AttributeDataList(data));
+        return packet;
+    }
+
+
 }

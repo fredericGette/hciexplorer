@@ -17,7 +17,8 @@ public class FindByTypeValueRequest extends AttributePacket {
     {
         if (attributeType.getUuid().toString().equals("00002800-0000-1000-8000-00805f9b34fb"))
         {
-            attributeValue = GattService.type16bits(data.read2octets());
+            // GATT Primary Service Declaration
+            attributeValue = GattService.type16bits(data);
         }
     }
 }
