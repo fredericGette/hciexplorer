@@ -36,6 +36,7 @@ public class AttributeType {
         switch(uuid.toString())
         {
             case "00002800-0000-1000-8000-00805f9b34fb" -> description = "GATT Primary Service Declaration";
+            case "00002802-0000-1000-8000-00805f9b34fb" -> description = "GATT Include Declaration";
             case "00002803-0000-1000-8000-00805f9b34fb" -> description = "GATT Characteristic Declaration";
             case "00002a04-0000-1000-8000-00805f9b34fb" -> description = "Peripheral Preferred Connection Parameters";
             case "00002a50-0000-1000-8000-00805f9b34fb" -> description = "PnP ID";

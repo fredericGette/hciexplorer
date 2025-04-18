@@ -51,6 +51,9 @@ public class L2capDecoder {
             case CONFIGURATION_RESPONSE -> packet = buildConfigurationResponse(data, length);
             case DISCONNECTION_REQUEST -> packet = buildDisconnectionRequest(data);
             case DISCONNECTION_RESPONSE -> packet = buildDisconnectionResponse(data);
+            case ECHO_RESPONSE -> packet = buildEchoResponse(data);
+            case CONNECTION_PARAMETER_UPDATE_REQUEST -> packet = buildConnectionParameterUpdateRequest(data);
+            case CONNECTION_PARAMETER_UPDATE_RESPONSE -> packet = buildConnectionParameterUpdateResponse(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", commandCode));
         }
@@ -95,6 +98,8 @@ public class L2capDecoder {
             case READ_BY_GROUP_TYPE_REQUEST -> packet = buildReadByGroupTypeRequest(data);
             case READ_BY_GROUP_TYPE_RESPONSE -> packet = buildReadByGroupTypeResponse(data);
             case READ_BY_TYPE_RESPONSE -> packet = buildReadByTypeResponse(data);
+            case FIND_INFORMATION_REQUEST -> packet = buildFindInformationRequest(data);
+            case READ_REQUEST -> packet = buildReadRequest(data);
             default -> throw new UnsupportedOperationException(
                     String.format("Code : %s", opcode));
         }
@@ -167,6 +172,26 @@ public class L2capDecoder {
         DisconnectionResponse command = new DisconnectionResponse();
         command.setDestinationCID(data.read2octets());
         command.setSourceCID(data.read2octets());
+        return command;
+    }
+
+    private EchoResponse buildEchoResponse(BinaryMessage data){
+        EchoResponse command = new EchoResponse();
+        return command;
+    }
+
+    private ConnectionParameterUpdateRequest buildConnectionParameterUpdateRequest(BinaryMessage data){
+        ConnectionParameterUpdateRequest command = new ConnectionParameterUpdateRequest();
+        command.setIntervalMin(data.read2octets());
+        command.setIntervalMax(data.read2octets());
+        command.setSlaveLatency(data.read2octets());
+        command.setTimeoutMultiplier(data.read2octets());
+        return command;
+    }
+
+    private ConnectionParameterUpdateResponse buildConnectionParameterUpdateResponse(BinaryMessage data){
+        ConnectionParameterUpdateResponse command = new ConnectionParameterUpdateResponse();
+        command.setResult(data.read2octets());
         return command;
     }
 
@@ -299,5 +324,16 @@ public class L2capDecoder {
         return packet;
     }
 
+    private FindInformationRequest buildFindInformationRequest(BinaryMessage data){
+        FindInformationRequest packet = new FindInformationRequest();
+        packet.setStartingHandle(data.read2octets());
+        packet.setEndingHandle(data.read2octets());
+        return packet;
+    }
 
+    private ReadRequest buildReadRequest(BinaryMessage data){
+        ReadRequest packet = new ReadRequest();
+        packet.setHandle(data.read2octets());
+        return packet;
+    }
 }
